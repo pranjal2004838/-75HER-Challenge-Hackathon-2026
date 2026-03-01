@@ -31,51 +31,44 @@ st.set_page_config(
 )
 
 # ============================================================================
-# PREMIUM CSS THEME - Psychology-Optimized UI
+# CLEAN MINIMAL UI - Premium Professional Design
 # ============================================================================
 
 st.markdown("""
 <style>
-    /* ========== COLOR SYSTEM (Empowering & Calming) ========== */
+    /* ========== MINIMAL COLOR SYSTEM ========== */
     :root {
-        --primary: #7C3AED;          /* Deep violet - ambition, creativity */
-        --primary-light: #A78BFA;
-        --secondary: #10B981;         /* Emerald - growth, success */
-        --secondary-light: #34D399;
-        --accent: #F59E0B;            /* Amber - celebration, warmth */
-        --surface: #FFFFFF;
-        --surface-elevated: #F8FAFC;
-        --background: #F1F5F9;
-        --text-primary: #1E293B;
-        --text-secondary: #64748B;
-        --text-muted: #94A3B8;
-        --border: #E2E8F0;
+        --primary: #6366F1;
+        --primary-dark: #4F46E5;
+        --primary-light: #818CF8;
         --success: #10B981;
-        --warning: #F59E0B;
-        --error: #EF4444;
-        --gradient-primary: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
-        --gradient-success: linear-gradient(135deg, #10B981 0%, #34D399 100%);
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --surface: #FFFFFF;
+        --background: #FAFAFA;
+        --text-primary: #0F172A;
+        --text-secondary: #64748B;
+        --border: #E2E8F0;
+        --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-        --shadow-glow: 0 0 20px rgb(124 58 237 / 0.3);
     }
     
-    /* ========== GLOBAL RESET ========== */
+    /* ========== GLOBAL ========== */
+    .stApp {
+        background: var(--background);
+    }
+    
     .main .block-container {
-        padding: 2rem 3rem 3rem !important;
-        max-width: 1200px !important;
+        padding: 2rem 4rem !important;
+        max-width: 1400px !important;
     }
     
-    /* Hide Streamlit branding */
     #MainMenu, footer, header {visibility: hidden;}
     .stDeployButton {display: none;}
     
     /* ========== TYPOGRAPHY ========== */
     h1 {
         color: var(--text-primary) !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.025em !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.02em !important;
         margin-bottom: 0.5rem !important;
     }
     
@@ -84,254 +77,152 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    p, .stMarkdown {
+    p {
         color: var(--text-secondary);
         line-height: 1.6;
     }
     
-    /* ========== SIDEBAR - Premium Dark Theme ========== */
+    /* ========== SIDEBAR - Clean Light ========== */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1E1B4B 0%, #312E81 100%) !important;
-        border-right: none !important;
-    }
-    
-    [data-testid="stSidebar"] * {
-        color: #E0E7FF !important;
+        background: white !important;
+        border-right: 1px solid var(--border) !important;
     }
     
     [data-testid="stSidebar"] .stButton > button {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease !important;
+        background: white !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text-primary) !important;
+        border-radius: 8px !important;
+        padding: 0.625rem 1rem !important;
+        font-weight: 500 !important;
+        transition: all 0.15s ease !important;
+        margin-bottom: 0.25rem !important;
     }
     
     [data-testid="stSidebar"] .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.2) !important;
-        transform: translateX(4px);
-        box-shadow: var(--shadow-glow);
+        background: var(--background) !important;
+        border-color: var(--primary) !important;
     }
     
     [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-        background: var(--gradient-primary) !important;
-        border: none !important;
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
+        color: white !important;
     }
     
-    /* ========== BUTTONS - Premium Feel ========== */
+    /* ========== BUTTONS ========== */
     .stButton > button {
-        border-radius: 12px !important;
-        font-weight: 600 !important;
-        padding: 0.75rem 1.5rem !important;
-        transition: all 0.2s ease !important;
-        border: 2px solid transparent !important;
+        border-radius: 8px !important;
+        font-weight: 500 !important;
+        padding: 0.625rem 1.25rem !important;
+        transition: all 0.15s ease !important;
+        border: 1px solid var(--border) !important;
     }
     
     .stButton > button[kind="primary"] {
-        background: var(--gradient-primary) !important;
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
         color: white !important;
-        box-shadow: var(--shadow-md);
     }
     
     .stButton > button[kind="primary"]:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg), var(--shadow-glow);
+        background: var(--primary-dark) !important;
+        border-color: var(--primary-dark) !important;
     }
     
     .stButton > button[kind="secondary"] {
         background: white !important;
-        color: var(--primary) !important;
-        border: 2px solid var(--primary) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border) !important;
     }
     
     .stButton > button[kind="secondary"]:hover {
-        background: var(--primary) !important;
-        color: white !important;
+        border-color: var(--primary) !important;
+        color: var(--primary) !important;
     }
     
-    /* ========== CARDS & CONTAINERS ========== */
+    /* ========== CARDS ========== */
     .stExpander {
-        background: var(--surface) !important;
+        background: white !important;
         border: 1px solid var(--border) !important;
-        border-radius: 16px !important;
+        border-radius: 8px !important;
         box-shadow: var(--shadow-sm) !important;
-        overflow: hidden;
     }
     
-    .stExpander:hover {
-        box-shadow: var(--shadow-md) !important;
-        border-color: var(--primary-light) !important;
-    }
-    
-    /* ========== PROGRESS BARS - Celebratory ========== */
+    /* ========== PROGRESS BARS ========== */
     .stProgress > div > div > div {
-        background: var(--gradient-success) !important;
-        border-radius: 999px !important;
+        background: var(--primary) !important;
     }
     
     .stProgress > div {
         background: var(--border) !important;
-        border-radius: 999px !important;
     }
     
-    /* ========== METRICS - Large & Impactful ========== */
+    /* ========== METRICS ========== */
     [data-testid="stMetricValue"] {
-        font-size: 2.5rem !important;
-        font-weight: 700 !important;
+        font-size: 2rem !important;
+        font-weight: 600 !important;
         color: var(--text-primary) !important;
-    }
-    
-    [data-testid="stMetricDelta"] {
-        font-size: 0.875rem !important;
     }
     
     /* ========== FORM INPUTS ========== */
     .stTextInput > div > div > input,
     .stTextArea > div > div > textarea,
-    .stSelectbox > div > div {
-        border-radius: 12px !important;
-        border: 2px solid var(--border) !important;
-        padding: 0.75rem 1rem !important;
-        transition: all 0.2s ease !important;
+    .stSelectbox > div > div > div {
+        border-radius: 8px !important;
+        border: 1px solid var(--border) !important;
+        padding: 0.625rem !important;
     }
     
     .stTextInput > div > div > input:focus,
     .stTextArea > div > div > textarea:focus {
         border-color: var(--primary) !important;
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1) !important;
-    }
-    
-    /* ========== CHAT MESSAGES ========== */
-    .stChatMessage {
-        border-radius: 20px !important;
-        padding: 1.25rem !important;
-        margin-bottom: 1rem !important;
-    }
-    
-    [data-testid="stChatMessageContent"] {
-        background: var(--surface-elevated) !important;
-        border-radius: 16px !important;
-        padding: 1rem !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
     }
     
     /* ========== TABS ========== */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem;
-        background: var(--surface-elevated);
-        padding: 0.5rem;
-        border-radius: 12px;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
     }
     
     .stTabs [data-baseweb="tab"] {
-        border-radius: 8px !important;
         padding: 0.75rem 1.5rem !important;
-        font-weight: 600 !important;
+        font-weight: 500 !important;
+        color: var(--text-secondary) !important;
+        border: none !important;
+        background: transparent !important;
     }
     
     .stTabs [aria-selected="true"] {
-        background: var(--primary) !important;
-        color: white !important;
+        color: var(--primary) !important;
+        border-bottom: 2px solid var(--primary) !important;
     }
     
-    /* ========== ALERTS & INFO BOXES ========== */
+    /* ========== ALERTS ========== */
     .stAlert {
-        border-radius: 12px !important;
-        border: none !important;
-        padding: 1rem 1.25rem !important;
-    }
-    
-    /* ========== SLIDER ========== */
-    .stSlider > div > div > div > div {
-        background: var(--primary) !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--border) !important;
     }
     
     /* ========== CHECKBOXES ========== */
-    .stCheckbox > label > div[data-testid="stMarkdownContainer"] > p {
-        font-size: 1rem !important;
+    .stCheckbox {
+        margin: 0.5rem 0 !important;
     }
     
-    /* ========== PREMIUM CARD CLASS ========== */
-    .premium-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem;
-        box-shadow: var(--shadow-md);
-        border: 1px solid var(--border);
-        margin-bottom: 1.5rem;
-    }
-    
-    .premium-card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-2px);
-        transition: all 0.3s ease;
-    }
-    
-    /* ========== CELEBRATION ANIMATION ========== */
-    @keyframes celebrate {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-    }
-    
-    .celebration {
-        animation: celebrate 0.5s ease-in-out;
-    }
-    
-    /* ========== GLOW EFFECT FOR IMPORTANT ELEMENTS ========== */
-    .glow-effect {
-        box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
-    }
-    
-    /* ========== GRADIENT TEXT ========== */
-    .gradient-text {
-        background: var(--gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    /* ========== LIFE EVENT BADGES ========== */
-    .life-event-badge {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        margin: 0.25rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    
-    .life-event-badge:hover {
-        transform: scale(1.05);
-    }
-    
-    /* ========== UNIQUE DIFFERENTIATOR - PULSE INDICATOR ========== */
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-    
+    /* ========== ADAPTIVE INDICATOR ========== */
     .adaptive-indicator {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        background: var(--success);
         color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 999px;
-        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 500;
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-    }
-    
-    .adaptive-indicator::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        background: white;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -393,38 +284,37 @@ def render_auth_page():
     """Render login/signup page."""
     
     st.markdown("""
-    <div style="text-align: center; padding: 2rem;">
-        <h1>🚀 HERPath AI</h1>
-        <p style="font-size: 1.2rem; color: #888;">
+    <div style="text-align: center; padding: 3rem 0 2rem;">
+        <h1 style="font-size: 2.5rem; font-weight: 600; margin-bottom: 0.5rem; color: #0F172A;">🚀 HERPath AI</h1>
+        <p style="font-size: 1.1rem; color: #64748B;">
             Transform your career goals into structured, trackable roadmaps
         </p>
     </div>
     """, unsafe_allow_html=True)
     
     # Tab selection
-    tab1, tab2 = st.tabs(["🔑 Login", "📝 Sign Up"])
+    tab1, tab2 = st.tabs(["Sign In", "Create Account"])
     
     with tab1:
         _render_login_form()
     
     with tab2:
         _render_signup_form()
-    
-    # Demo mode option
-    st.markdown("---")
-    st.markdown("**Or try demo mode:**")
-    if st.button("🎮 Enter Demo Mode", use_container_width=True):
-        _enter_demo_mode()
 
 
 def _render_login_form():
     """Render login form."""
     
     with st.form("login_form"):
-        email = st.text_input("Email", placeholder="your@email.com")
-        password = st.text_input("Password", type="password", placeholder="Your password")
+        st.markdown("#### Welcome back")
+        st.markdown("Sign in to your account")
+        st.markdown("")
         
-        submitted = st.form_submit_button("Login", use_container_width=True, type="primary")
+        email = st.text_input("Email", placeholder="your@email.com")
+        password = st.text_input("Password", type="password", placeholder="Enter your password")
+        
+        st.markdown("")
+        submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")
         
         if submitted:
             if email and password:
@@ -434,30 +324,35 @@ def _render_login_form():
                     st.session_state.uid = result['uid']
                     st.session_state.user_email = email
                     st.session_state.user_name = result.get('name', email.split('@')[0])
-                    st.success("✅ Login successful!")
+                    st.success("Login successful!")
                     st.rerun()
                 else:
-                    st.error(f"❌ {result}")
+                    st.error(result)
             else:
-                st.error("Please enter email and password")
+                st.error("Please enter both email and password")
 
 
 def _render_signup_form():
     """Render signup form."""
     
     with st.form("signup_form"):
-        name = st.text_input("Your Name", placeholder="Jane Doe")
-        email = st.text_input("Email", placeholder="your@email.com")
-        password = st.text_input("Password", type="password", placeholder="Min 6 characters")
-        confirm_password = st.text_input("Confirm Password", type="password")
+        st.markdown("#### Create your account")
+        st.markdown("Start your career transformation journey")
+        st.markdown("")
         
+        name = st.text_input("Full Name", placeholder="Your name")
+        email = st.text_input("Email", placeholder="your@email.com")
+        password = st.text_input("Password", type="password", placeholder="Minimum 6 characters")
+        confirm_password = st.text_input("Confirm Password", type="password", placeholder="Re-enter password")
+        
+        st.markdown("")
         submitted = st.form_submit_button("Create Account", use_container_width=True, type="primary")
         
         if submitted:
             if not all([name, email, password, confirm_password]):
                 st.error("Please fill in all fields")
             elif password != confirm_password:
-                st.error("Passwords don't match")
+                st.error("Passwords do not match")
             elif len(password) < 6:
                 st.error("Password must be at least 6 characters")
             else:
@@ -544,8 +439,8 @@ def render_sidebar():
     with st.sidebar:
         # Logo/Title
         st.markdown("""
-        <div style="text-align: center; padding: 1rem;">
-            <h2>🚀 HERPath AI</h2>
+        <div style="text-align: center; padding: 1.5rem 1rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 600; color: #0F172A; margin: 0;">🚀 HERPath AI</h2>
         </div>
         """, unsafe_allow_html=True)
         
@@ -553,9 +448,8 @@ def render_sidebar():
         
         # User info
         if st.session_state.get('user_name'):
-            st.markdown(f"**👤 {st.session_state.user_name}**")
-            if st.session_state.get('demo_mode'):
-                st.caption("🎮 Demo Mode")
+            st.markdown(f"**{st.session_state.user_name}**")
+            st.caption(st.session_state.get('user_email', ''))
         
         st.markdown("---")
         
@@ -584,65 +478,6 @@ def render_sidebar():
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
-        
-        # =====================================================================
-        # SISTER STORIES - Social Proof & Community (UNIQUE DIFFERENTIATOR)
-        # =====================================================================
-        st.markdown("---")
-        st.markdown("""
-        <div style="padding: 0.5rem;">
-            <p style="color: #7C3AED; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.75rem;">
-                💜 SISTER STORIES
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Rotating success stories from women
-        sister_stories = [
-            {
-                "name": "Priya R.",
-                "transition": "Teacher → Data Scientist",
-                "time": "8 months",
-                "quote": "HERPath understood when I needed to pause for family. No other platform did."
-            },
-            {
-                "name": "Anita M.",
-                "transition": "HR → Product Manager",
-                "time": "6 months",
-                "quote": "The adaptive roadmap felt like having a mentor who truly understood my life."
-            },
-            {
-                "name": "Divya S.",
-                "transition": "After 5-year break → UX Designer",
-                "time": "10 months",
-                "quote": "I wasn't starting over. I was continuing, just in a new direction."
-            },
-            {
-                "name": "Neha K.",
-                "transition": "Banking → Full-stack Dev",
-                "time": "12 months",
-                "quote": "When I felt overwhelmed, it auto-adjusted my load. That's empathy in tech."
-            }
-        ]
-        
-        import random
-        story_index = hash(st.session_state.get('uid', 'demo')) % len(sister_stories)
-        story = sister_stories[story_index]
-        
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #F3E8FF 0%, #EDE9FE 100%); 
-                    padding: 1rem; border-radius: 12px; border-left: 4px solid #7C3AED;">
-            <p style="font-style: italic; color: #374151; font-size: 0.85rem; margin: 0;">
-                "{story['quote']}"
-            </p>
-            <p style="color: #7C3AED; font-weight: 600; font-size: 0.8rem; margin-top: 0.5rem; margin-bottom: 0;">
-                — {story['name']}
-            </p>
-            <p style="color: #64748B; font-size: 0.7rem; margin: 0;">
-                {story['transition']} • {story['time']}
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
 
 
 # ============================================================================

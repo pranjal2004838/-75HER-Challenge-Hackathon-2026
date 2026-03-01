@@ -1,0 +1,15 @@
+/.venv/
+/herpath-ai/.venv/
+/.streamlit/secrets.toml
+/herpath-ai/.streamlit/secrets.toml
+__pycache__/
+*.pyc
+.pytest_cache/
+/.env
+/.env.*
+*.p12
+*.pem
+*.key
+/.idea/
+.vscode/
+/.DS_Store

@@ -1,8 +1,9 @@
 [theme]
-primaryColor = "#FF6B6B"
-backgroundColor = "#0E1117"
-secondaryBackgroundColor = "#262730"
-textColor = "#FAFAFA"
+# HERPath AI - Clean, Professional Theme
+primaryColor = "#6366F1"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F9FAFB"
+textColor = "#111827"
 font = "sans serif"
 
 [server]
@@ -10,6 +11,16 @@ headless = true
 port = 8501
 enableCORS = false
 enableXsrfProtection = true
+maxUploadSize = 5
 
 [browser]
 gatherUsageStats = false
+serverAddress = "localhost"
+
+[runner]
+magicEnabled = true
+fastReruns = true
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = true

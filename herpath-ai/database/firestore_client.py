@@ -5,7 +5,6 @@ Option B: Versioned roadmaps - each rebalance creates new document.
 """
 
 import streamlit as st
-from firebase_admin import firestore
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 from .schema import (
@@ -21,13 +20,24 @@ class FirestoreClient:
     def __init__(self):
         """Initialize Firestore client."""
         self._db = None
+        self._demo_mode = False
     
     @property
     def db(self):
         """Lazy load Firestore client."""
         if self._db is None:
-            self._db = firestore.client()
+            try:
+                from firebase_admin import firestore
+                self._db = firestore.client()
+            except Exception as e:
+                st.warning(f"⚠️ Firestore not available: {e}. Using demo mode.")
+                self._demo_mode = True
+                return None
         return self._db
+    
+    def _is_demo_mode(self):
+        """Check if running in demo mode (no Firebase)."""
+        return self._demo_mode or self.db is None
     
     # =========================================================================
     # USER OPERATIONS
@@ -35,6 +45,12 @@ class FirestoreClient:
     
     def create_user(self, user_data: dict) -> bool:
         """Create a new user document."""
+        if self._is_demo_mode():
+            # Store in session state for demo
+            if 'demo_users' not in st.session_state:
+                st.session_state.demo_users = {}
+            st.session_state.demo_users[user_data.get('uid')] = user_data
+            return True
         try:
             user = UserSchema(**user_data)
             self.db.collection('users').document(user.uid).set(user.model_dump())
@@ -45,6 +61,8 @@ class FirestoreClient:
     
     def get_user(self, uid: str) -> Optional[dict]:
         """Get user document by UID."""
+        if self._is_demo_mode():
+            return st.session_state.get('demo_users', {}).get(uid)
         try:
             doc = self.db.collection('users').document(uid).get()
             if doc.exists:
@@ -56,6 +74,10 @@ class FirestoreClient:
     
     def update_user(self, uid: str, updates: dict) -> bool:
         """Update user document."""
+        if self._is_demo_mode():
+            if 'demo_users' in st.session_state and uid in st.session_state.demo_users:
+                st.session_state.demo_users[uid].update(updates)
+            return True
         try:
             updates['updated_at'] = datetime.utcnow()
             self.db.collection('users').document(uid).update(updates)
@@ -77,6 +99,15 @@ class FirestoreClient:
         Create a new roadmap version.
         Deactivates previous active roadmap for user.
         """
+        if self._is_demo_mode():
+            # Store in session state for demo
+            if 'demo_roadmaps' not in st.session_state:
+                st.session_state.demo_roadmaps = {}
+            uid = roadmap_data.get('uid')
+            roadmap_data['is_active'] = True
+            roadmap_data['doc_id'] = f"demo_roadmap_{uid}"
+            st.session_state.demo_roadmaps[uid] = roadmap_data
+            return roadmap_data['doc_id']
         try:
             uid = roadmap_data.get('uid')
             
@@ -97,6 +128,8 @@ class FirestoreClient:
     
     def _deactivate_user_roadmaps(self, uid: str):
         """Deactivate all active roadmaps for a user."""
+        if self._is_demo_mode():
+            return
         try:
             docs = self.db.collection('roadmaps')\
                 .where('uid', '==', uid)\
@@ -110,6 +143,8 @@ class FirestoreClient:
     
     def get_active_roadmap(self, uid: str) -> Optional[dict]:
         """Get the currently active roadmap for a user."""
+        if self._is_demo_mode():
+            return st.session_state.get('demo_roadmaps', {}).get(uid)
         try:
             docs = self.db.collection('roadmaps')\
                 .where('uid', '==', uid)\
@@ -240,6 +275,22 @@ class FirestoreClient:
     
     def update_progress(self, uid: str) -> Optional[dict]:
         """Calculate and update progress summary."""
+        if self._is_demo_mode():
+            # Return demo progress data
+            progress_data = {
+                'uid': uid,
+                'completion_percentage': 25.0,
+                'missed_tasks_count': 0,
+                'completed_tasks_count': 3,
+                'total_tasks_count': 12,
+                'pace_status': 'on_track',
+                'current_week': 1,
+                'last_updated': datetime.utcnow()
+            }
+            if 'demo_progress' not in st.session_state:
+                st.session_state.demo_progress = {}
+            st.session_state.demo_progress[uid] = progress_data
+            return progress_data
         try:
             tasks = self.get_all_user_tasks(uid)
             roadmap = self.get_active_roadmap(uid)
@@ -283,6 +334,8 @@ class FirestoreClient:
     
     def get_progress(self, uid: str) -> Optional[dict]:
         """Get progress summary for user."""
+        if self._is_demo_mode():
+            return st.session_state.get('demo_progress', {}).get(uid, self.update_progress(uid))
         try:
             doc = self.db.collection('progress_summary').document(uid).get()
             if doc.exists:

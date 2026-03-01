@@ -13,31 +13,56 @@ def test_imports():
     """Test that all modules can be imported."""
     print("🔍 Testing imports...")
     
+    errors = []
+    
     try:
         # Config
-        from config import firebase_config, settings
-        print("  ✅ config module")
-        
+        from config import settings
+        print("  ✅ config.settings module")
+    except Exception as e:
+        errors.append(f"config.settings: {e}")
+        print(f"  ❌ config.settings: {e}")
+    
+    try:
+        from config import firebase_config
+        print("  ✅ config.firebase_config module")
+    except Exception as e:
+        errors.append(f"config.firebase_config: {e}")
+        print(f"  ⚠️ config.firebase_config: {e} (will use demo mode)")
+    
+    try:
         # Database
         from database import FirestoreClient, UserSchema, RoadmapSchema
         print("  ✅ database module")
-        
+    except Exception as e:
+        errors.append(f"database: {e}")
+        print(f"  ❌ database: {e}")
+    
+    try:
         # Agents
         from agents import SkillGapAgent, RoadmapAgent, RebalanceAgent, CoachAgent
         print("  ✅ agents module")
-        
+    except Exception as e:
+        errors.append(f"agents: {e}")
+        print(f"  ❌ agents: {e}")
+    
+    try:
         # UI
         from ui import render_onboarding, render_dashboard, render_roadmap
         print("  ✅ ui module")
-        
+    except Exception as e:
+        errors.append(f"ui: {e}")
+        print(f"  ❌ ui: {e}")
+    
+    try:
         # Utils
         from utils import RuleEngine, rule_engine
         print("  ✅ utils module")
-        
-        return True
     except Exception as e:
-        print(f"  ❌ Import error: {e}")
-        return False
+        errors.append(f"utils: {e}")
+        print(f"  ❌ utils: {e}")
+    
+    return len(errors) == 0
 
 
 def test_config():
@@ -193,26 +218,38 @@ def test_dependencies():
     """Test that all required packages are installed."""
     print("\n📦 Testing dependencies...")
     
+    # Required packages
     required = [
-        'streamlit',
-        'firebase_admin',
-        'google.cloud.firestore',
-        'openai',
-        'anthropic',
-        'pydantic'
+        ('streamlit', True),
+        ('pydantic', True),
+        ('openai', True),
     ]
     
-    all_installed = True
+    # Optional packages (for full features)
+    optional = [
+        ('firebase_admin', False),
+        ('google.cloud.firestore', False),
+        ('anthropic', False),
+    ]
     
-    for package in required:
+    all_required_installed = True
+    
+    for package, is_required in required:
         try:
             __import__(package)
             print(f"  ✅ {package}")
         except ImportError:
-            print(f"  ❌ {package} - NOT INSTALLED")
-            all_installed = False
+            print(f"  ❌ {package} - NOT INSTALLED (required)")
+            all_required_installed = False
     
-    return all_installed
+    for package, _ in optional:
+        try:
+            __import__(package)
+            print(f"  ✅ {package}")
+        except ImportError:
+            print(f"  ⚠️ {package} - not installed (optional, demo mode available)")
+    
+    return all_required_installed
 
 
 def main():

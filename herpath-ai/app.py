@@ -249,28 +249,42 @@ def init_session_state():
 
 
 def init_firebase():
-    """Initialize Firebase connection."""
+    """Initialize Firebase connection. Returns True if initialized or demo mode enabled."""
     if st.session_state.get('firebase_initialized'):
+        return True
+    
+    if st.session_state.get('demo_mode'):
+        # Demo mode enabled - no Firebase needed
         return True
     
     try:
         from config.firebase_config import init_firebase as fb_init
         success = fb_init()
-        st.session_state.firebase_initialized = success
-        return success
+        if success:
+            st.session_state.firebase_initialized = True
+            return True
+        else:
+            # Firebase not configured - suggest demo mode
+            st.session_state.demo_mode = True
+            return True
+    except ImportError as e:
+        # Firebase not installed - use demo mode
+        st.warning(f"⚠️ Firebase not available ({e}). Running in demo mode.")
+        st.session_state.demo_mode = True
+        return True
     except Exception as e:
         st.error(f"Firebase initialization error: {e}")
-        return False
+        st.session_state.demo_mode = True
+        return True
 
 
 def get_db_client():
-    """Get Firestore client instance."""
-    if not st.session_state.get('firebase_initialized'):
-        return None
-    
+    """Get Firestore client instance. Works in demo mode too."""
     try:
         from database import FirestoreClient
-        return FirestoreClient()
+        client = FirestoreClient()
+        # The client will automatically detect demo mode
+        return client
     except Exception as e:
         st.error(f"Database client error: {e}")
         return None
@@ -725,8 +739,8 @@ def main():
         # Initialize session state
         init_session_state()
         
-        # Initialize Firebase
-        firebase_ready = init_firebase()
+        # Initialize Firebase (will auto-enable demo mode if needed)
+        init_firebase()
         
         # Check authentication
         if not st.session_state.get('authenticated'):
@@ -736,12 +750,12 @@ def main():
         # Render sidebar
         render_sidebar()
         
-        # Get database client
+        # Get database client (works in both Firebase and demo mode)
         db_client = get_db_client()
         
-        # Show warning if Firebase not configured
-        if not firebase_ready or not db_client:
-            st.warning("⚠️ Firebase not configured. Running in demo mode with limited functionality.")
+        # Show demo mode indicator if active
+        if st.session_state.get('demo_mode'):
+            st.info("💡 Running in demo mode. Data is stored locally and won't persist.")
         
         # Render main content
         render_main_content(db_client)

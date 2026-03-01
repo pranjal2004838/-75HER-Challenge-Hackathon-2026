@@ -1,5 +1,15 @@
 """Config module initialization."""
-from .firebase_config import init_firebase, get_firebase_app
+try:
+    from .firebase_config import init_firebase, get_firebase_app, is_firebase_configured
+except ImportError:
+    # Firebase not available, provide stubs
+    def init_firebase():
+        return False
+    def get_firebase_app():
+        return None
+    def is_firebase_configured():
+        return False
+
 from .settings import (
     get_openai_api_key,
     get_anthropic_api_key,

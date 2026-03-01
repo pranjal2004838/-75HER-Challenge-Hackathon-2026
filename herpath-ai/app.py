@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 """
 HERPath AI - Main Application Entry Point
 A stateful, adaptive career execution system for women in tech.
@@ -30,54 +31,310 @@ st.set_page_config(
 )
 
 # ============================================================================
-# CUSTOM CSS
+# PREMIUM CSS THEME - Psychology-Optimized UI
 # ============================================================================
 
 st.markdown("""
 <style>
-    /* Main theme colors */
+    /* ========== COLOR SYSTEM (Empowering & Calming) ========== */
     :root {
-        --primary-color: #FF6B6B;
-        --secondary-color: #4ECDC4;
-        --background-color: #1E1E1E;
-        --text-color: #FFFFFF;
+        --primary: #7C3AED;          /* Deep violet - ambition, creativity */
+        --primary-light: #A78BFA;
+        --secondary: #10B981;         /* Emerald - growth, success */
+        --secondary-light: #34D399;
+        --accent: #F59E0B;            /* Amber - celebration, warmth */
+        --surface: #FFFFFF;
+        --surface-elevated: #F8FAFC;
+        --background: #F1F5F9;
+        --text-primary: #1E293B;
+        --text-secondary: #64748B;
+        --text-muted: #94A3B8;
+        --border: #E2E8F0;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --error: #EF4444;
+        --gradient-primary: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+        --gradient-success: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --shadow-glow: 0 0 20px rgb(124 58 237 / 0.3);
+    }
+    
+    /* ========== GLOBAL RESET ========== */
+    .main .block-container {
+        padding: 2rem 3rem 3rem !important;
+        max-width: 1200px !important;
     }
     
     /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
+    #MainMenu, footer, header {visibility: hidden;}
+    .stDeployButton {display: none;}
     
-    /* Sidebar styling */
-    .css-1d391kg {
-        background-color: #1a1a2e;
+    /* ========== TYPOGRAPHY ========== */
+    h1 {
+        color: var(--text-primary) !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.025em !important;
+        margin-bottom: 0.5rem !important;
     }
     
-    /* Button styling */
+    h2, h3 {
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+    }
+    
+    p, .stMarkdown {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+    
+    /* ========== SIDEBAR - Premium Dark Theme ========== */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1E1B4B 0%, #312E81 100%) !important;
+        border-right: none !important;
+    }
+    
+    [data-testid="stSidebar"] * {
+        color: #E0E7FF !important;
+    }
+    
+    [data-testid="stSidebar"] .stButton > button {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease !important;
+    }
+    
+    [data-testid="stSidebar"] .stButton > button:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        transform: translateX(4px);
+        box-shadow: var(--shadow-glow);
+    }
+    
+    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
+        background: var(--gradient-primary) !important;
+        border: none !important;
+    }
+    
+    /* ========== BUTTONS - Premium Feel ========== */
     .stButton > button {
-        border-radius: 10px;
-        font-weight: 600;
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        padding: 0.75rem 1.5rem !important;
+        transition: all 0.2s ease !important;
+        border: 2px solid transparent !important;
     }
     
-    /* Card-like containers */
+    .stButton > button[kind="primary"] {
+        background: var(--gradient-primary) !important;
+        color: white !important;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .stButton > button[kind="primary"]:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+    
+    .stButton > button[kind="secondary"] {
+        background: white !important;
+        color: var(--primary) !important;
+        border: 2px solid var(--primary) !important;
+    }
+    
+    .stButton > button[kind="secondary"]:hover {
+        background: var(--primary) !important;
+        color: white !important;
+    }
+    
+    /* ========== CARDS & CONTAINERS ========== */
     .stExpander {
-        border-radius: 10px;
-        border: 1px solid #333;
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 16px !important;
+        box-shadow: var(--shadow-sm) !important;
+        overflow: hidden;
     }
     
-    /* Progress bar */
+    .stExpander:hover {
+        box-shadow: var(--shadow-md) !important;
+        border-color: var(--primary-light) !important;
+    }
+    
+    /* ========== PROGRESS BARS - Celebratory ========== */
     .stProgress > div > div > div {
-        background-color: #4ECDC4;
+        background: var(--gradient-success) !important;
+        border-radius: 999px !important;
     }
     
-    /* Metrics */
+    .stProgress > div {
+        background: var(--border) !important;
+        border-radius: 999px !important;
+    }
+    
+    /* ========== METRICS - Large & Impactful ========== */
     [data-testid="stMetricValue"] {
-        font-size: 1.5rem;
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
     }
     
-    /* Chat messages */
-    .stChatMessage {
-        border-radius: 15px;
+    [data-testid="stMetricDelta"] {
+        font-size: 0.875rem !important;
     }
+    
+    /* ========== FORM INPUTS ========== */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea,
+    .stSelectbox > div > div {
+        border-radius: 12px !important;
+        border: 2px solid var(--border) !important;
+        padding: 0.75rem 1rem !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stTextArea > div > div > textarea:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1) !important;
+    }
+    
+    /* ========== CHAT MESSAGES ========== */
+    .stChatMessage {
+        border-radius: 20px !important;
+        padding: 1.25rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    [data-testid="stChatMessageContent"] {
+        background: var(--surface-elevated) !important;
+        border-radius: 16px !important;
+        padding: 1rem !important;
+    }
+    
+    /* ========== TABS ========== */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.5rem;
+        background: var(--surface-elevated);
+        padding: 0.5rem;
+        border-radius: 12px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: var(--primary) !important;
+        color: white !important;
+    }
+    
+    /* ========== ALERTS & INFO BOXES ========== */
+    .stAlert {
+        border-radius: 12px !important;
+        border: none !important;
+        padding: 1rem 1.25rem !important;
+    }
+    
+    /* ========== SLIDER ========== */
+    .stSlider > div > div > div > div {
+        background: var(--primary) !important;
+    }
+    
+    /* ========== CHECKBOXES ========== */
+    .stCheckbox > label > div[data-testid="stMarkdownContainer"] > p {
+        font-size: 1rem !important;
+    }
+    
+    /* ========== PREMIUM CARD CLASS ========== */
+    .premium-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border);
+        margin-bottom: 1.5rem;
+    }
+    
+    .premium-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+    
+    /* ========== CELEBRATION ANIMATION ========== */
+    @keyframes celebrate {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .celebration {
+        animation: celebrate 0.5s ease-in-out;
+    }
+    
+    /* ========== GLOW EFFECT FOR IMPORTANT ELEMENTS ========== */
+    .glow-effect {
+        box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+    }
+    
+    /* ========== GRADIENT TEXT ========== */
+    .gradient-text {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* ========== LIFE EVENT BADGES ========== */
+    .life-event-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin: 0.25rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .life-event-badge:hover {
+        transform: scale(1.05);
+    }
+    
+    /* ========== UNIQUE DIFFERENTIATOR - PULSE INDICATOR ========== */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .adaptive-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .adaptive-indicator::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+</style>
+""", unsafe_allow_html=True)
 </style>
 """, unsafe_allow_html=True)
 
@@ -329,6 +586,65 @@ def render_sidebar():
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
+        
+        # =====================================================================
+        # SISTER STORIES - Social Proof & Community (UNIQUE DIFFERENTIATOR)
+        # =====================================================================
+        st.markdown("---")
+        st.markdown("""
+        <div style="padding: 0.5rem;">
+            <p style="color: #7C3AED; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.75rem;">
+                💜 SISTER STORIES
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Rotating success stories from women
+        sister_stories = [
+            {
+                "name": "Priya R.",
+                "transition": "Teacher → Data Scientist",
+                "time": "8 months",
+                "quote": "HERPath understood when I needed to pause for family. No other platform did."
+            },
+            {
+                "name": "Anita M.",
+                "transition": "HR → Product Manager",
+                "time": "6 months",
+                "quote": "The adaptive roadmap felt like having a mentor who truly understood my life."
+            },
+            {
+                "name": "Divya S.",
+                "transition": "After 5-year break → UX Designer",
+                "time": "10 months",
+                "quote": "I wasn't starting over. I was continuing, just in a new direction."
+            },
+            {
+                "name": "Neha K.",
+                "transition": "Banking → Full-stack Dev",
+                "time": "12 months",
+                "quote": "When I felt overwhelmed, it auto-adjusted my load. That's empathy in tech."
+            }
+        ]
+        
+        import random
+        story_index = hash(st.session_state.get('uid', 'demo')) % len(sister_stories)
+        story = sister_stories[story_index]
+        
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #F3E8FF 0%, #EDE9FE 100%); 
+                    padding: 1rem; border-radius: 12px; border-left: 4px solid #7C3AED;">
+            <p style="font-style: italic; color: #374151; font-size: 0.85rem; margin: 0;">
+                "{story['quote']}"
+            </p>
+            <p style="color: #7C3AED; font-weight: 600; font-size: 0.8rem; margin-top: 0.5rem; margin-bottom: 0;">
+                — {story['name']}
+            </p>
+            <p style="color: #64748B; font-size: 0.7rem; margin: 0;">
+                {story['transition']} • {story['time']}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 # ============================================================================

@@ -113,6 +113,10 @@ client_x509_cert_url = "your-cert-url"
 
 ### 4. Run the Application
 ```bash
+# For Python 3.14+ (recommended)
+python -X utf8 -m streamlit run app.py
+
+# Or with standard Python
 streamlit run app.py
 ```
 

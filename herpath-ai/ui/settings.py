@@ -141,9 +141,225 @@ def _render_profile_settings(db_client, uid: str, user_data: Dict):
 
 
 def _render_rebalance_section(db_client, uid: str, user_data: Dict, roadmap_data: Dict, progress_data: Dict):
-    """Render roadmap rebalancing section."""
+    """Render roadmap rebalancing section with Life Events."""
     
-    st.subheader("⚖️ Roadmap Rebalancing")
+    # =====================================================================
+    # UNIQUE DIFFERENTIATOR: LIFE EVENTS QUICK TRIGGERS
+    # This is what makes HERPath different from Coursera/LinkedIn Learning
+    # =====================================================================
+    
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%); 
+                border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; color: white;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <span class="adaptive-indicator">🔄 ADAPTIVE</span>
+        </div>
+        <h3 style="margin: 0; color: white;">Life Happens. Your Roadmap Adapts.</h3>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9; color: #E0E7FF;">
+            Unlike static courses, HERPath automatically adjusts to your real life. 
+            Select a life event below and we'll restructure your entire learning path.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.subheader("🌸 What's happening in your life?")
+    st.caption("Select an event and we'll intelligently rebalance your roadmap")
+    
+    # Life Events Grid - UNIQUE FEATURE
+    life_events = {
+        "new_job": {
+            "icon": "💼",
+            "label": "Started New Job",
+            "description": "Less time for learning, need to adjust pace",
+            "hours_change": -5,
+            "message": "Congratulations on your new role! Let's slow down your learning pace while you settle in."
+        },
+        "more_time": {
+            "icon": "⏰",
+            "label": "More Free Time",
+            "description": "Can dedicate more hours weekly",
+            "hours_change": +5,
+            "message": "Great! Let's accelerate your learning and get you to your goal faster."
+        },
+        "family_care": {
+            "icon": "👨‍👩‍👧",
+            "label": "Family Responsibilities",
+            "description": "Need to reduce workload temporarily",
+            "hours_change": -3,
+            "message": "Family comes first. We'll spread your tasks over more weeks so nothing feels rushed."
+        },
+        "burnout": {
+            "icon": "😮‍💨",
+            "label": "Feeling Overwhelmed",
+            "description": "Need a lighter pace, self-care focus",
+            "hours_change": -4,
+            "message": "It's okay to slow down. We're reducing your weekly load and adding buffer time."
+        },
+        "motivation_high": {
+            "icon": "🔥",
+            "label": "Highly Motivated",
+            "description": "Ready to push harder towards goal",
+            "hours_change": +3,
+            "message": "Love the energy! Let's channel that motivation into faster progress."
+        },
+        "health_break": {
+            "icon": "🏥",
+            "label": "Health/Medical",
+            "description": "Need extended recovery time",
+            "hours_change": -6,
+            "message": "Your health is the priority. Take all the time you need - your roadmap will wait."
+        },
+        "career_pivot": {
+            "icon": "🔄",
+            "label": "Career Direction Change",
+            "description": "Want to adjust my goal path",
+            "hours_change": 0,
+            "message": "Let's realign your roadmap with your new direction."
+        },
+        "celebration": {
+            "icon": "🎉",
+            "label": "Milestone Achieved",
+            "description": "Just got a win worth celebrating!",
+            "hours_change": 0,
+            "message": "Amazing! Let's celebrate this win and keep the momentum going! 🎊"
+        }
+    }
+    
+    # Display as clickable cards
+    cols = st.columns(4)
+    selected_event = None
+    
+    for idx, (event_key, event_data) in enumerate(life_events.items()):
+        with cols[idx % 4]:
+            # Create a card-like button for each event
+            if st.button(
+                f"{event_data['icon']} {event_data['label']}",
+                key=f"life_event_{event_key}",
+                use_container_width=True,
+                help=event_data['description']
+            ):
+                selected_event = event_key
+                st.session_state.selected_life_event = event_key
+    
+    # If an event was just selected or is in session state
+    if 'selected_life_event' in st.session_state:
+        event_key = st.session_state.selected_life_event
+        event_data = life_events.get(event_key, {})
+        
+        st.markdown("---")
+        st.markdown(f"""
+        <div style="background: #F0FDF4; border-left: 4px solid #10B981; 
+                    padding: 1rem 1.5rem; border-radius: 0 12px 12px 0; margin: 1rem 0;">
+            <strong>{event_data['icon']} {event_data['message']}</strong>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Show impact preview
+        hours_change = event_data.get('hours_change', 0)
+        current_hours = user_data.get('weekly_hours', 10)
+        new_hours = max(3, current_hours + hours_change)
+        
+        if hours_change != 0:
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Current Hours", f"{current_hours}/week")
+            with col2:
+                st.metric("Suggested Hours", f"{new_hours}/week", delta=f"{hours_change:+d}")
+            with col3:
+                # Calculate new timeline
+                current_week = roadmap_data.get('current_week', 1)
+                remaining_weeks = roadmap_data.get('total_weeks', 12) - current_week
+                if hours_change < 0:
+                    new_remaining = int(remaining_weeks * current_hours / new_hours)
+                    st.metric("New Timeline", f"+{new_remaining - remaining_weeks} weeks")
+                else:
+                    new_remaining = int(remaining_weeks * current_hours / new_hours)
+                    st.metric("Time Saved", f"{remaining_weeks - new_remaining} weeks")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✨ Apply This Change", type="primary", use_container_width=True):
+                _execute_life_event_rebalance(
+                    db_client, uid, user_data, roadmap_data, progress_data,
+                    event_key, event_data, new_hours if hours_change != 0 else None
+                )
+        with col2:
+            if st.button("Cancel", use_container_width=True):
+                del st.session_state.selected_life_event
+                st.rerun()
+    
+    st.markdown("---")
+    
+    # Keep manual rebalance as advanced option
+    with st.expander("⚙️ Advanced: Custom Rebalance"):
+        _render_manual_rebalance(db_client, uid, user_data, roadmap_data, progress_data)
+
+
+def _execute_life_event_rebalance(db_client, uid, user_data, roadmap_data, progress_data, event_key, event_data, new_hours):
+    """Execute rebalance based on life event."""
+    
+    from agents import RebalanceAgent, simple_rebalance
+    from utils import sanitize_roadmap_output, ensure_week_continuity
+    from datetime import datetime
+    
+    with st.spinner(f"Adapting your roadmap for: {event_data['label']}..."):
+        rebalance_reason = f"Life Event: {event_data['label']} - {event_data['description']}"
+        
+        try:
+            rebalance_agent = RebalanceAgent()
+            new_roadmap = rebalance_agent.rebalance(
+                current_roadmap=roadmap_data,
+                progress_data=progress_data,
+                user_data=user_data,
+                rebalance_reason=rebalance_reason,
+                new_weekly_hours=new_hours,
+                new_deadline_weeks=None
+            )
+        except Exception:
+            new_roadmap = None
+        
+        if not new_roadmap:
+            new_roadmap = simple_rebalance(
+                current_roadmap=roadmap_data,
+                progress_data=progress_data,
+                new_weekly_hours=new_hours,
+                original_weekly_hours=user_data.get('weekly_hours', 10)
+            )
+        
+        new_roadmap = sanitize_roadmap_output(new_roadmap)
+        new_roadmap['phases'] = ensure_week_continuity(new_roadmap.get('phases', []))
+        
+        roadmap_data_to_save = {
+            'uid': uid,
+            **new_roadmap,
+            'current_week': progress_data.get('current_week', 1),
+            'is_active': True,
+            'rebalance_reason': rebalance_reason,
+            'life_event': event_key,
+            'generated_at': datetime.utcnow()
+        }
+        
+        if db_client:
+            db_client.create_roadmap(roadmap_data_to_save)
+            if new_hours:
+                db_client.update_user(uid, {'weekly_hours': new_hours})
+        else:
+            st.session_state.demo_roadmap_data = roadmap_data_to_save
+            if new_hours and 'demo_user_data' in st.session_state:
+                st.session_state.demo_user_data['weekly_hours'] = new_hours
+    
+    # Clear the selection
+    if 'selected_life_event' in st.session_state:
+        del st.session_state.selected_life_event
+    
+    # Success message with celebration
+    st.balloons()
+    st.success(f"🎉 Your roadmap has been adapted! {event_data['message']}")
+    st.rerun()
+
+
+def _render_manual_rebalance(db_client, uid: str, user_data: Dict, roadmap_data: Dict, progress_data: Dict):
+    """Render manual rebalance form (advanced option)."""
     
     # Check if rebalance is suggested
     suggest = st.session_state.get('suggest_rebalance', False)

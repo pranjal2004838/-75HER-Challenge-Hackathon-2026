@@ -1,6 +1,7 @@
 """
 Roadmap page UI component.
 Displays the full roadmap with collapsible weekly blocks.
+Premium styling with adaptive learning indicators.
 """
 
 import streamlit as st
@@ -10,17 +11,41 @@ from typing import Dict, Any, List
 def render_roadmap(db_client, user_data: Dict, roadmap_data: Dict, progress_data: Dict):
     """
     Render the roadmap page with collapsible phases and weeks.
-    
-    Args:
-        db_client: FirestoreClient instance
-        user_data: User profile data
-        roadmap_data: Active roadmap data
-        progress_data: Progress summary data
+    Premium UX with adaptive learning visibility.
     """
     try:
-        st.title("🗺️ Your Learning Roadmap")
+        # =====================================================================
+        # PREMIUM HEADER WITH ADAPTIVE BADGE
+        # =====================================================================
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.markdown("""
+            <div style="margin-bottom: 1rem;">
+                <h1 style="color: #1E293B; margin: 0;">🗺️ Your Learning Roadmap</h1>
+                <p style="color: #64748B; margin-top: 0.25rem; font-size: 1.1rem;">
+                    A personalized path that adapts to your life
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
         
-        # Summary stats
+        with col2:
+            # ADAPTIVE INDICATOR - Make it VERY visible
+            version = roadmap_data.get('version', 1)
+            version_text = f"v{version}" if version > 1 else "Initial"
+            st.markdown(f"""
+            <div style="text-align: right; margin-top: 1rem;">
+                <div style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #9333EA 100%);
+                            color: white; padding: 0.5rem 1rem; border-radius: 20px;
+                            font-size: 0.85rem; font-weight: 600;">
+                    🔄 ADAPTIVE ROADMAP
+                </div>
+                <p style="font-size: 0.75rem; color: #64748B; margin-top: 0.5rem;">
+                    {version_text} • Updates with your life
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Summary stats with premium styling
         _render_roadmap_summary(roadmap_data, progress_data)
         
         st.markdown("---")

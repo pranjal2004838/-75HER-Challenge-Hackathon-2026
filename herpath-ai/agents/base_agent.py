@@ -1,58 +1,43 @@
 """
 Base agent class for HERPath AI.
-Handles LLM communication with OpenAI or Anthropic.
+Handles LLM communication with Google Gemini API (REST).
 """
 
 import json
 import re
+import time
+import requests
 from typing import Optional, Dict, Any
 from abc import ABC, abstractmethod
 
-# Lazy imports for API clients
-_openai_client = None
-_anthropic_client = None
+# Gemini API configuration
+_gemini_api_key = None
 
 
-def get_openai_client():
-    """Lazy load OpenAI client."""
-    global _openai_client
-    if _openai_client is None:
-        from openai import OpenAI
+def get_gemini_api_key():
+    """Get Gemini API key from environment or Streamlit secrets."""
+    global _gemini_api_key
+    if _gemini_api_key is None:
         import streamlit as st
         import os
         
-        api_key = st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY", ""))
-        if api_key:
-            _openai_client = OpenAI(api_key=api_key)
-    return _openai_client
-
-
-def get_anthropic_client():
-    """Lazy load Anthropic client."""
-    global _anthropic_client
-    if _anthropic_client is None:
-        from anthropic import Anthropic
-        import streamlit as st
-        import os
-        
-        api_key = st.secrets.get("ANTHROPIC_API_KEY", os.getenv("ANTHROPIC_API_KEY", ""))
-        if api_key:
-            _anthropic_client = Anthropic(api_key=api_key)
-    return _anthropic_client
+        _gemini_api_key = st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
+    return _gemini_api_key
 
 
 class BaseAgent(ABC):
-    """Base class for all HERPath AI agents."""
+    """Base class for all HERPath AI agents (Gemini-powered)."""
     
-    def __init__(self, provider: str = "openai"):
+    def __init__(self, provider: str = "gemini"):
         """
-        Initialize agent.
+        Initialize agent for Gemini.
         
         Args:
-            provider: "openai" or "anthropic"
+            provider: Currently only "gemini" is supported
         """
-        self.provider = provider
-        self.model = "gpt-4-turbo-preview" if provider == "openai" else "claude-3-sonnet-20240229"
+        self.provider = "gemini"  # Force Gemini
+        self.model = "gemini-2.0-flash"  # Latest Gemini model
+        self.api_endpoint = "https://generativelanguage.googleapis.com/v1beta/models"
     
     @property
     @abstractmethod
@@ -65,60 +50,89 @@ class BaseAgent(ABC):
         """Build the user prompt with context injection."""
         pass
     
-    def call_llm(self, user_prompt: str, temperature: float = 0.7) -> Optional[str]:
+    def call_llm(self, user_prompt: str, temperature: float = 0.7, retries: int = 3) -> Optional[str]:
         """
-        Call LLM with the given prompt.
+        Call Gemini API with retry logic to handle transient errors.
         
         Args:
             user_prompt: The user message/prompt
             temperature: Sampling temperature (0-1)
+            retries: Number of retries on transient errors
             
         Returns:
             LLM response text or None if error
         """
+        last_error = None
+        for attempt in range(retries):
+            try:
+                return self._call_gemini(user_prompt, temperature)
+            except Exception as e:
+                last_error = e
+                error_str = str(e)
+                # Check if it's a retryable error (5xx, rate limit, timeout, connection)
+                is_retryable = (
+                    "500" in error_str or "502" in error_str or "503" in error_str or
+                    "rate_limit" in error_str.lower() or "timeout" in error_str.lower() or
+                    "connection" in error_str.lower()
+                )
+                if not is_retryable or attempt == retries - 1:
+                    # Not retryable or last attempt; log and fail
+                    import streamlit as st
+                    st.error(f"LLM Error (attempt {attempt+1}/{retries}): {error_str}")
+                    return None
+                # Retryable; backoff and retry
+                wait = 2 ** attempt  # exponential backoff: 1s, 2s, 4s
+                import streamlit as st
+                st.warning(f"LLM error (attempt {attempt+1}/{retries}), retrying in {wait}s: {error_str}")
+                time.sleep(wait)
+    
+    def _call_gemini(self, user_prompt: str, temperature: float) -> Optional[str]:
+        """Call Gemini API via REST."""
+        api_key = get_gemini_api_key()
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY not found in environment or Streamlit secrets")
+        
+        # Gemini API endpoint
+        url = f"{self.api_endpoint}/{self.model}:generateContent?key={api_key}"
+        
+        headers = {
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {
+                            "text": f"{self.system_prompt}\n\n{user_prompt}"
+                        }
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "temperature": min(max(temperature, 0), 2),
+                "maxOutputTokens": 4000
+            }
+        }
+        
         try:
-            if self.provider == "openai":
-                return self._call_openai(user_prompt, temperature)
-            else:
-                return self._call_anthropic(user_prompt, temperature)
-        except Exception as e:
-            import streamlit as st
-            st.error(f"LLM Error: {str(e)}")
-            return None
-    
-    def _call_openai(self, user_prompt: str, temperature: float) -> Optional[str]:
-        """Call OpenAI API."""
-        client = get_openai_client()
-        if not client:
-            return None
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+            response.raise_for_status()
+            response_data = response.json()
+        except requests.exceptions.HTTPError as e:
+            # Log the full response for debugging
+            error_msg = f"Gemini API {response.status_code}: {response.text}"
+            raise ValueError(error_msg)
         
-        response = client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=temperature,
-            max_tokens=4000
-        )
-        return response.choices[0].message.content
-    
-    def _call_anthropic(self, user_prompt: str, temperature: float) -> Optional[str]:
-        """Call Anthropic API."""
-        client = get_anthropic_client()
-        if not client:
-            return None
+        # Extract text from Gemini response
+        if "candidates" in response_data and len(response_data["candidates"]) > 0:
+            candidate = response_data["candidates"][0]
+            if "content" in candidate and "parts" in candidate["content"]:
+                parts = candidate["content"]["parts"]
+                if len(parts) > 0:
+                    return parts[0].get("text", "")
         
-        response = client.messages.create(
-            model=self.model,
-            max_tokens=4000,
-            system=self.system_prompt,
-            messages=[
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=temperature
-        )
-        return response.content[0].text
+        raise ValueError(f"Unexpected Gemini response format: {response_data}")
     
     def extract_json(self, response: str) -> Optional[Dict[str, Any]]:
         """Extract JSON from LLM response."""

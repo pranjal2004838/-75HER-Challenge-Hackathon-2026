@@ -38,11 +38,13 @@ def init_firebase():
         st.warning(f"Firebase not installed: {e}. Running in demo mode.")
         return False
     
-    if _check_firebase_apps():
+    # If no Firebase app is initialized yet, attempt to initialize using secrets/env
+    if not _check_firebase_apps():
         # Try to load from Streamlit secrets first
         try:
             if "firebase_credentials" in st.secrets:
-                cred_dict = st.secrets["firebase_credentials"]
+                # Streamlit returns an AttrDict; convert to plain dict for firebase_admin
+                cred_dict = dict(st.secrets["firebase_credentials"])
                 cred = credentials.Certificate(cred_dict)
                 firebase_admin.initialize_app(cred, {
                     'databaseURL': st.secrets.get("firebase_database_url", "")
@@ -62,6 +64,18 @@ def init_firebase():
         except Exception as e:
             st.error(f"Firebase initialization error: {str(e)}")
             return False
+
+    # Confirm initialization succeeded
+    if _check_firebase_apps():
+        _firebase_initialized = True
+        try:
+            _firebase_app = firebase_admin.get_app()
+        except Exception:
+            _firebase_app = None
+        return True
+    else:
+        st.warning("⚠️ Firebase not configured after init attempt. Running in demo mode.")
+        return False
     
     _firebase_initialized = True
     return True

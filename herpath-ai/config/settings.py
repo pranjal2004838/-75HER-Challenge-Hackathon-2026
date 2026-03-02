@@ -1,42 +1,33 @@
 """
 Application settings and configuration.
-All API keys and credentials should be added to Streamlit secrets.
+All API keys and credentials should be added to Streamlit secrets or .env.
 """
 
 import os
 import streamlit as st
 
 # =============================================================================
-# LLM CONFIGURATION
+# LLM CONFIGURATION (Gemini-only)
 # =============================================================================
 
-# TODO: Add your OpenAI API key to Streamlit secrets as "OPENAI_API_KEY"
-# TODO: Add your Anthropic API key to Streamlit secrets as "ANTHROPIC_API_KEY"
+# NOTE: Gemini API key should be added to .env as "GEMINI_API_KEY" or Streamlit secrets
 
-def get_openai_api_key():
-    """Get OpenAI API key from secrets or environment."""
+def get_gemini_api_key():
+    """Get Gemini API key from secrets or environment."""
     try:
-        return st.secrets.get("OPENAI_API_KEY", os.getenv("OPENAI_API_KEY", ""))
+        return st.secrets.get("GEMINI_API_KEY", os.getenv("GEMINI_API_KEY", ""))
     except:
-        return os.getenv("OPENAI_API_KEY", "")
-
-def get_anthropic_api_key():
-    """Get Anthropic API key from secrets or environment."""
-    try:
-        return st.secrets.get("ANTHROPIC_API_KEY", os.getenv("ANTHROPIC_API_KEY", ""))
-    except:
-        return os.getenv("ANTHROPIC_API_KEY", "")
+        return os.getenv("GEMINI_API_KEY", "")
 
 # =============================================================================
 # LLM PROVIDER SELECTION
 # =============================================================================
 
-# Options: "openai" or "anthropic"
-LLM_PROVIDER = "openai"
+# NOTE: Only Gemini is supported now
+LLM_PROVIDER = "gemini"
 
 # Model configurations
-OPENAI_MODEL = "gpt-4-turbo-preview"
-ANTHROPIC_MODEL = "claude-3-sonnet-20240229"
+GEMINI_MODEL = "gemini-2.0-flash"
 
 # =============================================================================
 # APPLICATION SETTINGS
@@ -113,27 +104,18 @@ COACH_MODES = [
 ]
 
 # =============================================================================
-# FIREBASE CONFIGURATION PLACEHOLDER
+# FIREBASE & GEMINI CONFIGURATION
 # =============================================================================
 
 """
-TODO: Add to .streamlit/secrets.toml:
+Required environment configuration:
 
-[firebase_credentials]
-type = "service_account"
-project_id = "YOUR_PROJECT_ID"
-private_key_id = "YOUR_PRIVATE_KEY_ID"
-private_key = "YOUR_PRIVATE_KEY"
-client_email = "YOUR_CLIENT_EMAIL"
-client_id = "YOUR_CLIENT_ID"
-auth_uri = "https://accounts.google.com/o/oauth2/auth"
-token_uri = "https://oauth2.googleapis.com/token"
-auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
-client_x509_cert_url = "YOUR_CERT_URL"
+.env file should contain:
+- GEMINI_API_KEY = "your-gemini-api-key"
+- FIREBASE_CREDENTIALS_JSON = {...service account JSON...}
+- FIREBASE_DATABASE_URL = "https://your-project.firebaseio.com"
 
-FIREBASE_DATABASE_URL = "https://YOUR_PROJECT_ID.firebaseio.com"
-FIREBASE_WEB_API_KEY = "YOUR_WEB_API_KEY"
-
-OPENAI_API_KEY = "sk-..."
-ANTHROPIC_API_KEY = "sk-ant-..."
+Or use .streamlit/secrets.toml with same keys.
 """
+
+

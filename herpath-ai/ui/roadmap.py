@@ -208,20 +208,66 @@ def _render_week(week: Dict, current_week: int, db_client, uid: str):
         
         # Resources
         resources = week.get('resources', [])
-        if resources:
-            with st.expander("📚 Resources"):
-                for res in resources:
-                    res_name = res.get('name', 'Resource')
-                    res_type = res.get('type', '')
-                    res_cost = res.get('cost', 'Free')
-                    res_url = res.get('url', '')
-                    
-                    st.markdown(f"**{res_name}** ({res_type})")
-                    if res_url:
-                        st.markdown(f"[Open]({res_url}) | {res_cost}")
-                    else:
-                        st.caption(res_cost)
+        interview_relevance = week.get('interview_relevance', '')
         
+        if interview_relevance:
+            st.markdown(f"""
+            <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 0.6rem 1rem; 
+                        border-radius: 6px; margin: 0.5rem 0;">
+                <p style="margin: 0; color: #92400E; font-size: 0.85rem;">
+                    🎯 <strong>Interview Relevance:</strong> {interview_relevance}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        if resources:
+            with st.expander("📚 Resources (Free & Paid)"):
+                free_res = [r for r in resources if str(r.get('cost', '')).lower() in ('free', '0', '$0')]
+                paid_res = [r for r in resources if r not in free_res]
+                
+                if free_res:
+                    st.markdown("**🆓 Free Resources**")
+                    for res in free_res:
+                        res_name = res.get('name', 'Resource')
+                        res_type = res.get('type', '')
+                        res_url = res.get('url', '')
+                        why = res.get('why_recommended', '')
+                        time_est = res.get('time_estimate', '')
+                        
+                        st.markdown(f"**{res_name}** `{res_type}`")
+                        if why:
+                            st.caption(f"💡 {why}")
+                        col_a, col_b = st.columns([3, 1])
+                        with col_a:
+                            if res_url and res_url.startswith('http'):
+                                st.markdown(f"[→ Open Resource]({res_url})")
+                        with col_b:
+                            if time_est:
+                                st.caption(f"⏱ {time_est}")
+                        st.markdown("---")
+                
+                if paid_res:
+                    st.markdown("**💳 Paid Alternatives**")
+                    for res in paid_res:
+                        res_name = res.get('name', 'Resource')
+                        res_type = res.get('type', '')
+                        res_cost = res.get('cost', '')
+                        res_url = res.get('url', '')
+                        why = res.get('why_recommended', '')
+                        time_est = res.get('time_estimate', '')
+                        
+                        st.markdown(f"**{res_name}** `{res_type}` — {res_cost}")
+                        if why:
+                            st.caption(f"💡 {why}")
+                        col_a, col_b = st.columns([3, 1])
+                        with col_a:
+                            if res_url and res_url.startswith('http'):
+                                st.markdown(f"[→ Open Resource]({res_url})")
+                        with col_b:
+                            if time_est:
+                                st.caption(f"⏱ {time_est}")
+                        st.markdown("---")
+
         st.markdown("---")
 
 

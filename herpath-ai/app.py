@@ -10,6 +10,10 @@ import streamlit as st
 import sys
 import os
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file FIRST - before any Firebase initialization
+load_dotenv()
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -473,6 +477,7 @@ def render_sidebar():
             ("🗺️", "Roadmap", "roadmap"),
             ("📊", "Progress", "progress"),
             ("🤖", "AI Coach", "coach"),
+            ("📚", "Resources", "resources"),
             ("⚙️", "Settings", "settings")
         ]
         
@@ -564,6 +569,10 @@ def render_main_content(db_client):
             from ui import render_settings
             render_settings(db_client, user_data, roadmap_data, progress_data)
         
+        elif page == 'resources':
+            from ui import render_resources
+            render_resources(db_client, user_data, roadmap_data, progress_data)
+        
         else:
             st.error(f"Unknown page: {page}")
     
@@ -578,7 +587,8 @@ def _page_error(page: str, error: Exception):
         'roadmap': 'Roadmap',
         'progress': 'Progress',
         'coach': 'AI Coach',
-        'settings': 'Settings'
+        'settings': 'Settings',
+        'resources': 'Resources'
     }
     page_name = page_names.get(page, page.title())
     

@@ -12,6 +12,154 @@ from .schema import (
     ProgressSchema, ChatSchema, TaskStatus
 )
 import json
+import uuid
+
+# Import FieldFilter for proper Firestore query syntax (avoids deprecation warning)
+try:
+    from google.cloud.firestore_v1.base_query import FieldFilter
+except ImportError:
+    FieldFilter = None  # Fallback for demo mode
+
+
+# Lightweight in-memory Firestore stub for demo mode (uses Streamlit session_state)
+class _DemoFirestoreModule:
+    class Query:
+        DESCENDING = 'DESC'
+
+
+class _DemoFirestore:
+    def __init__(self, client_owner):
+        self._owner = client_owner
+
+    def collection(self, name):
+        return _DemoCollection(name)
+
+    def batch(self):
+        return _DemoBatch()
+
+
+class _DemoCollection:
+    def __init__(self, name):
+        self.name = name
+        if f'demo_{self.name}' not in st.session_state:
+            st.session_state[f'demo_{self.name}'] = {}
+
+    def document(self, doc_id: Optional[str] = None):
+        if not doc_id:
+            doc_id = str(uuid.uuid4())
+        return _DemoDocRef(self.name, doc_id)
+
+    def add(self, data: dict):
+        doc_id = str(uuid.uuid4())
+        st.session_state[f'demo_{self.name}'][doc_id] = dict(data)
+        return (None, _DemoDocRef(self.name, doc_id))
+
+    def where(self, field, op, value):
+        return _DemoQuery(self.name).where(field, op, value)
+
+    def order_by(self, *args, **kwargs):
+        return _DemoQuery(self.name).order_by(*args, **kwargs)
+
+    def stream(self):
+        # return all docs
+        docs = []
+        for doc_id, data in st.session_state.get(f'demo_{self.name}', {}).items():
+            docs.append(_DemoDocSnapshot(self.name, doc_id, data))
+        return docs
+
+
+class _DemoDocRef:
+    def __init__(self, collection, doc_id):
+        self.id = doc_id
+        self._collection = collection
+
+    def set(self, data: dict):
+        st.session_state.setdefault(f'demo_{self._collection}', {})[self.id] = dict(data)
+
+    def update(self, updates: dict):
+        col = st.session_state.setdefault(f'demo_{self._collection}', {})
+        if self.id in col:
+            col[self.id].update(updates)
+        else:
+            col[self.id] = dict(updates)
+
+    def get(self):
+        col = st.session_state.get(f'demo_{self._collection}', {})
+        data = col.get(self.id)
+        return _DemoDocSnapshot(self._collection, self.id, data)
+
+
+class _DemoDocSnapshot:
+    def __init__(self, collection, doc_id, data):
+        self.id = doc_id
+        self._data = data
+        self._collection = collection
+        self.reference = _DemoDocRef(self._collection, doc_id)
+
+    @property
+    def exists(self):
+        return self._data is not None
+
+    def to_dict(self):
+        return dict(self._data) if self._data is not None else None
+
+
+class _DemoQuery:
+    def __init__(self, collection):
+        self._collection = collection
+        self._filters = []
+        self._order = None
+        self._limit = None
+
+    def where(self, field, op, value):
+        self._filters.append((field, op, value))
+        return self
+
+    def order_by(self, field, direction=None):
+        self._order = (field, direction)
+        return self
+
+    def limit(self, n: int):
+        self._limit = n
+        return self
+
+    def stream(self):
+        all_docs = st.session_state.get(f'demo_{self._collection}', {})
+        results = []
+        for doc_id, data in all_docs.items():
+            ok = True
+            for field, op, value in self._filters:
+                if data.get(field) != value:
+                    ok = False
+                    break
+            if ok:
+                results.append(_DemoDocSnapshot(self._collection, doc_id, data))
+
+        if self._order:
+            key, direction = self._order
+            results.sort(key=lambda d: d.to_dict().get(key))
+            if direction == _DemoFirestoreModule.Query.DESCENDING:
+                results.reverse()
+
+        if self._limit is not None:
+            results = results[: self._limit]
+
+        return results
+
+
+class _DemoBatch:
+    def __init__(self):
+        self._ops = []
+
+    def set(self, doc_ref: _DemoDocRef, data: dict):
+        self._ops.append(('set', doc_ref, data))
+
+    def commit(self):
+        for op, doc_ref, data in self._ops:
+            if op == 'set':
+                st.session_state.setdefault(f'demo_{doc_ref._collection}', {})[doc_ref.id] = dict(data)
+        self._ops = []
+
 
 
 class FirestoreClient:
@@ -29,10 +177,15 @@ class FirestoreClient:
             try:
                 from firebase_admin import firestore
                 self._db = firestore.client()
+                # expose real firestore module to module scope for code that references it
+                globals()['firestore'] = firestore
             except Exception as e:
                 st.warning(f"⚠️ Firestore not available: {e}. Using demo mode.")
                 self._demo_mode = True
-                return None
+                # install demo stub both as module-level 'firestore' and as client
+                globals()['firestore'] = _DemoFirestoreModule()
+                self._db = _DemoFirestore(self)
+                return self._db
         return self._db
     
     def _is_demo_mode(self):
@@ -131,10 +284,13 @@ class FirestoreClient:
         if self._is_demo_mode():
             return
         try:
-            docs = self.db.collection('roadmaps')\
-                .where('uid', '==', uid)\
-                .where('is_active', '==', True)\
-                .stream()
+            query = self.db.collection('roadmaps')
+            if FieldFilter:
+                query = query.where(filter=FieldFilter('uid', '==', uid))
+                query = query.where(filter=FieldFilter('is_active', '==', True))
+            else:
+                query = query.where('uid', '==', uid).where('is_active', '==', True)
+            docs = query.stream()
             
             for doc in docs:
                 doc.reference.update({'is_active': False})
@@ -146,11 +302,13 @@ class FirestoreClient:
         if self._is_demo_mode():
             return st.session_state.get('demo_roadmaps', {}).get(uid)
         try:
-            docs = self.db.collection('roadmaps')\
-                .where('uid', '==', uid)\
-                .where('is_active', '==', True)\
-                .limit(1)\
-                .stream()
+            query = self.db.collection('roadmaps')
+            if FieldFilter:
+                query = query.where(filter=FieldFilter('uid', '==', uid))
+                query = query.where(filter=FieldFilter('is_active', '==', True))
+            else:
+                query = query.where('uid', '==', uid).where('is_active', '==', True)
+            docs = query.limit(1).stream()
             
             for doc in docs:
                 data = doc.to_dict()
@@ -164,10 +322,12 @@ class FirestoreClient:
     def get_roadmap_history(self, uid: str) -> List[dict]:
         """Get all roadmap versions for a user (for history/undo)."""
         try:
-            docs = self.db.collection('roadmaps')\
-                .where('uid', '==', uid)\
-                .order_by('roadmap_version', direction=firestore.Query.DESCENDING)\
-                .stream()
+            query = self.db.collection('roadmaps')
+            if FieldFilter:
+                query = query.where(filter=FieldFilter('uid', '==', uid))
+            else:
+                query = query.where('uid', '==', uid)
+            docs = query.order_by('roadmap_version', direction=firestore.Query.DESCENDING).stream()
             
             return [doc.to_dict() for doc in docs]
         except Exception as e:
@@ -230,10 +390,13 @@ class FirestoreClient:
             if not roadmap:
                 return []
             
-            docs = self.db.collection('tasks')\
-                .where('uid', '==', uid)\
-                .where('week_number', '==', week_number)\
-                .stream()
+            query = self.db.collection('tasks')
+            if FieldFilter:
+                query = query.where(filter=FieldFilter('uid', '==', uid))
+                query = query.where(filter=FieldFilter('week_number', '==', week_number))
+            else:
+                query = query.where('uid', '==', uid).where('week_number', '==', week_number)
+            docs = query.stream()
             
             return [doc.to_dict() | {'doc_id': doc.id} for doc in docs]
         except Exception as e:
@@ -260,9 +423,12 @@ class FirestoreClient:
             if not roadmap:
                 return []
             
-            docs = self.db.collection('tasks')\
-                .where('uid', '==', uid)\
-                .stream()
+            query = self.db.collection('tasks')
+            if FieldFilter:
+                query = query.where(filter=FieldFilter('uid', '==', uid))
+            else:
+                query = query.where('uid', '==', uid)
+            docs = query.stream()
             
             return [doc.to_dict() | {'doc_id': doc.id} for doc in docs]
         except Exception as e:
@@ -362,14 +528,20 @@ class FirestoreClient:
     def get_chat_history(self, uid: str, limit: int = 50) -> List[dict]:
         """Get chat history for user."""
         try:
-            docs = self.db.collection('chat_history')\
-                .where('uid', '==', uid)\
-                .order_by('timestamp', direction=firestore.Query.DESCENDING)\
-                .limit(limit)\
-                .stream()
+            # Simple query without composite index requirement
+            query = self.db.collection('chat_history')
+            if FieldFilter:
+                query = query.where(filter=FieldFilter('uid', '==', uid))
+            else:
+                query = query.where('uid', '==', uid)
             
+            # Fetch all docs and sort locally to avoid index requirement
+            docs = query.stream()
             chats = [doc.to_dict() for doc in docs]
-            return list(reversed(chats))  # Return in chronological order
+            
+            # Sort by timestamp locally
+            chats.sort(key=lambda x: x.get('timestamp', 0))
+            return chats[-limit:] if len(chats) > limit else chats
         except Exception as e:
             st.error(f"Error fetching chat history: {e}")
             return []

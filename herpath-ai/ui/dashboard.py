@@ -324,9 +324,10 @@ def _render_weekly_focus(roadmap_data: Dict, db_client, uid: str):
             col1, col2 = st.columns([0.1, 0.9])
             with col1:
                 checked = st.checkbox(
-                    "",
+                    label="Complete task",
                     value=(status == 'completed'),
-                    key=f"task_{task_id}"
+                    key=f"task_{task_id}",
+                    label_visibility="collapsed"
                 )
             with col2:
                 if status == 'completed':
@@ -353,13 +354,27 @@ def _render_weekly_focus(roadmap_data: Dict, db_client, uid: str):
     
     # Resources (if available)
     resources = week_data.get('resources', [])
+    interview_rel = week_data.get('interview_relevance', '')
+    if interview_rel:
+        st.markdown(f"""
+        <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 0.6rem 1rem;
+                    border-radius: 6px; margin: 0.5rem 0;">
+            <p style="margin: 0; color: #92400E; font-size: 0.85rem;">
+                🎯 <strong>Interview Relevance:</strong> {interview_rel}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     if resources:
-        with st.expander("📚 Recommended Resources"):
+        with st.expander("📚 This Week's Resources (Free & Paid)"):
             for res in resources:
-                st.markdown(f"**{res.get('name', 'Resource')}**")
-                st.caption(f"{res.get('type', '')} | {res.get('cost', 'Free')} | {res.get('time_estimate', '')}")
-                if res.get('url'):
-                    st.markdown(f"[Open Resource]({res.get('url')})")
+                cost = str(res.get('cost', '')).lower()
+                is_free = cost in ('free', '0', '$0')
+                badge = "🆓" if is_free else "💳"
+                st.markdown(f"{badge} **{res.get('name', 'Resource')}** `{res.get('type', '')}`")
+                if res.get('why_recommended'):
+                    st.caption(f"💡 {res.get('why_recommended')}")
+                if res.get('url', '').startswith('http'):
+                    st.markdown(f"[→ Open]({res.get('url')}) · {res.get('cost', 'Free')} · {res.get('time_estimate', '')}")
                 st.markdown("---")
 
 

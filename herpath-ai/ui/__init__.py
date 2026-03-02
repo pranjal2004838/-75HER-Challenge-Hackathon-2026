@@ -5,3 +5,4 @@ from .roadmap import render_roadmap, render_roadmap_history
 from .progress import render_progress
 from .coach import render_coach
 from .settings import render_settings
+from .resources import render_resources

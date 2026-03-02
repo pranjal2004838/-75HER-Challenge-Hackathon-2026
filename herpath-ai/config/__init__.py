@@ -11,8 +11,7 @@ except ImportError:
         return False
 
 from .settings import (
-    get_openai_api_key,
-    get_anthropic_api_key,
+    get_gemini_api_key,
     LLM_PROVIDER,
     SUPPORTED_ROLES,
     SKILL_LEVELS,

@@ -36,7 +36,7 @@ class BaseAgent(ABC):
             provider: Currently only "gemini" is supported
         """
         self.provider = "gemini"  # Force Gemini
-        self.model = "gemini-2.0-flash"  # Latest available Gemini 2.0 Flash model
+        self.model = "gemini-3-flash"  # Latest available Gemini 3 Flash model
         self.api_endpoint = "https://generativelanguage.googleapis.com/v1beta/models"
     
     @property

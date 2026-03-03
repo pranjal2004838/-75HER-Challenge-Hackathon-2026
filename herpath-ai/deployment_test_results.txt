@@ -1,0 +1,57 @@
+C:\Users\anurag\Desktop\-75HER-Challenge-Hackathon-2026\herpath-ai\deployment_readiness_test.py:61: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  'created_at': datetime.utcnow()
+2026-03-03 06:15:29.680 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-03-03 06:15:29.855 
+  Warning: to view this Streamlit app on a browser, run it with the following
+  command:
+
+    streamlit run deployment_readiness_test.py [ARGUMENTS]
+2026-03-03 06:15:29.855 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-03-03 06:15:29.856 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+Traceback (most recent call last):
+  File "C:\Users\anurag\Desktop\-75HER-Challenge-Hackathon-2026\herpath-ai\deployment_readiness_test.py", line 397, in main
+    results['onboarding_ai'] = test_onboarding_ai_with_role_specificity()
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\anurag\Desktop\-75HER-Challenge-Hackathon-2026\herpath-ai\deployment_readiness_test.py", line 117, in test_onboarding_ai_with_role_specificity
+    ai_engineer_skills_set = set(ai_engineer_analysis.get('missing_skills', []))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+================================================================================
+  DEPLOYMENT READINESS TEST SUITE
+  Testing Firebase, AI Agents, and User Flows
+================================================================================
+
+================================================================================
+  TEST 1: Firebase Initialization
+================================================================================
+Γ£ô Firebase initialization: SUCCESS
+Γ£ô Firebase configured: YES
+
+================================================================================
+  TEST 2: Firestore CRUD Operations
+================================================================================
+Γ£ô User creation: FAILED
+Γ£ô User retrieval: FAILED
+
+================================================================================
+  TEST 3: Onboarding AI - Role Specificity
+================================================================================
+
+--- Test Case 3.1: AI Engineer Role ---
+Γ£ô Skill Gap Analysis: FAILED
+
+--- Test Case 3.2: Web Developer Role ---
+Γ£ô Web Dev Analysis: FAILED
+
+Γ¥î TEST SUITE ERROR: 'NoneType' object has no attribute 'get'
+
+================================================================================
+  TEST SUMMARY
+================================================================================
+  Γ£à PASS  Firebase Init
+  Γ¥î FAIL  Firestore Ops
+
+  Overall: 1/2 tests passed (50.0%)
+
+  Γ¥î NOT READY - Critical issues must be fixed

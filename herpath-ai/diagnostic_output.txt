@@ -1,0 +1,33 @@
+2026-03-03 06:18:05.713 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-03-03 06:18:05.855 
+  Warning: to view this Streamlit app on a browser, run it with the following
+  command:
+
+    streamlit run quick_diagnostic.py [ARGUMENTS]
+2026-03-03 06:18:05.855 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-03-03 06:18:05.855 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+======================================================================
+  QUICK DIAGNOSTIC TEST
+======================================================================
+
+=== Testing Gemini API ===
+Agent provider: gemini
+Agent model: gemini-2.5-flash
+API key configured: True
+
+Testing skill gap analysis...
+Result: FAILED
+Agent returned None
+
+=== Testing Firebase/Firestore ===
+Firebase initialized: True
+Firebase configured: True
+Demo mode: False
+User creation: FAILED
+User retrieval: FAILED
+
+======================================================================
+SUMMARY
+======================================================================
+Gemini API: FAILED
+Firebase:   FAILED

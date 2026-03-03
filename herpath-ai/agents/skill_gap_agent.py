@@ -42,6 +42,14 @@ CURRENT LEVEL: {current_level}
 AVAILABLE HOURS/WEEK: {weekly_hours}
 CURRENT SITUATION: {situation}
 
+CRITICAL ROLE-SPECIFICITY RULE:
+- ALL required_skills and missing_skills MUST be specific to the "{role}" role.
+- For "AI Engineer": list ML/DL skills (Python, NumPy, Pandas, scikit-learn, PyTorch/TensorFlow, NLP, CV, MLOps, LLMs). Do NOT list web development skills (HTML/CSS/JS/React).
+- For "Web Developer": list web skills (HTML, CSS, JavaScript, React/Vue/Angular, Node.js, databases, REST APIs, deployment). Do NOT list ML/AI skills.
+- For "Data Analyst": list data skills (Excel, SQL, Python/Pandas, statistics, Tableau/Power BI, A/B testing). Do NOT list deep web dev or ML engineering skills.
+- For "Career Re-entry into Tech": list general refresher skills and guide toward specialisation.
+- NEVER produce a generic skill list. Each skill must directly relate to the target role.
+
 USER BACKGROUND (analyze for skills AND emotional signals):
 {background_text}
 

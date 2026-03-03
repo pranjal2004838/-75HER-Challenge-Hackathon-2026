@@ -111,7 +111,7 @@ class BaseAgent(ABC):
             ],
             "generationConfig": {
                 "temperature": min(max(temperature, 0), 2),
-                "maxOutputTokens": 4000
+                "maxOutputTokens": 16384
             }
         }
         

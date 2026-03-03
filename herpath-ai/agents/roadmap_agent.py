@@ -76,6 +76,15 @@ OUTPUT FORMAT: You must respond with ONLY valid JSON. No explanations, no markdo
         return f"""Generate a hyper-specific, deeply personalized learning roadmap for this user:
 
 TARGET ROLE: {role}
+
+CRITICAL ROLE-SPECIFICITY RULE:
+- The ENTIRE roadmap must be specifically tailored for the "{role}" role.
+- For "AI Engineer": focus on Python for ML, linear algebra, statistics, scikit-learn, PyTorch/TensorFlow, deep learning, NLP, computer vision, MLOps, LLMs. Do NOT include web development (HTML/CSS/JS) or generic coding bootcamp content.
+- For "Web Developer": focus on HTML/CSS, JavaScript, React/Vue/Angular, Node.js, databases, REST APIs, deployment. Do NOT include ML/AI or data science content.
+- For "Data Analyst": focus on Excel, SQL, Python for data (Pandas), statistics, data visualization (Tableau/Power BI), A/B testing, business communication. Do NOT include deep web dev or ML engineering content.
+- For "Career Re-entry into Tech": focus on catching up, refreshing fundamentals, choosing a specialization, building confidence, networking, portfolio building.
+- NEVER generate a generic "software developer" roadmap. Every week must clearly relate to the target role.
+
 SKILLS TO ACQUIRE (in priority order): {priority_order}
 ALL MISSING SKILLS: {missing_skills}
 DEADLINE: {deadline_str}
@@ -214,194 +223,702 @@ CRITICAL GUIDELINES:
         )
 
 
+def _get_role_specific_skills(role: str) -> Dict[str, Any]:
+    """Get role-specific foundation, building, and mastery skills for fallback roadmaps."""
+
+    # ── AI Engineer ──────────────────────────────────────────────────────
+    if role == "AI Engineer":
+        foundation = [
+            {
+                "focus_skill": "Python for AI & Environment Setup",
+                "task_list": [
+                    "Install Python 3.11+, set up Conda/venv, install Jupyter (2 hours)",
+                    "Python for data science: NumPy arrays, broadcasting, vectorisation (3 hours)",
+                    "Write helper functions with type hints & unit tests using pytest (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Python Official Tutorial", "type": "documentation", "url": "https://docs.python.org/3/tutorial/", "cost": "Free", "time_estimate": "2 hours"},
+                    {"name": "CS231n Python/NumPy Tutorial", "type": "tutorial", "url": "https://cs231n.github.io/python-numpy-tutorial/", "cost": "Free", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Linear Algebra & Statistics for ML",
+                "task_list": [
+                    "Vectors, matrices, eigenvalues - 3Blue1Brown Essence of Linear Algebra (3 hours)",
+                    "Probability distributions, Bayes theorem, hypothesis testing (2 hours)",
+                    "Implement matrix operations from scratch in NumPy (2 hours)"
+                ],
+                "resources": [
+                    {"name": "3Blue1Brown Linear Algebra", "type": "video", "url": "https://youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab", "cost": "Free", "time_estimate": "4 hours"},
+                    {"name": "Khan Academy Statistics", "type": "course", "url": "https://khanacademy.org/math/statistics-probability", "cost": "Free", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Data Wrangling with Pandas & Visualisation",
+                "task_list": [
+                    "Pandas: DataFrames, groupby, merge, pivot tables on real datasets (3 hours)",
+                    "Matplotlib & Seaborn: histograms, scatter plots, heatmaps (2 hours)",
+                    "Clean and explore a Kaggle dataset end-to-end (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Kaggle Pandas Course", "type": "course", "url": "https://kaggle.com/learn/pandas", "cost": "Free", "time_estimate": "4 hours"},
+                    {"name": "Python Data Science Handbook", "type": "book", "url": "https://jakevdp.github.io/PythonDataScienceHandbook/", "cost": "Free", "time_estimate": "5 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Machine Learning Fundamentals with Scikit-learn",
+                "task_list": [
+                    "Supervised learning: Linear/Logistic Regression, Decision Trees, Random Forests (3 hours)",
+                    "Model evaluation: cross-validation, confusion matrix, ROC-AUC, F1 score (2 hours)",
+                    "Build an end-to-end ML pipeline on a Kaggle dataset (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Andrew Ng ML Specialisation", "type": "course", "url": "https://coursera.org/specializations/machine-learning-introduction", "cost": "Free to audit", "time_estimate": "10 hours"},
+                    {"name": "Scikit-learn Official Tutorial", "type": "documentation", "url": "https://scikit-learn.org/stable/tutorial/", "cost": "Free", "time_estimate": "4 hours"}
+                ]
+            }
+        ]
+        building = [
+            {
+                "focus_skill": "Deep Learning with PyTorch/TensorFlow",
+                "task_list": [
+                    "Neural network fundamentals: forward pass, backprop, gradient descent (3 hours)",
+                    "Build a CNN for image classification (MNIST/CIFAR-10) in PyTorch (2 hours)",
+                    "Train an RNN/LSTM for text sequence prediction (2 hours)"
+                ],
+                "resources": [
+                    {"name": "fast.ai Practical Deep Learning", "type": "course", "url": "https://course.fast.ai/", "cost": "Free", "time_estimate": "15 hours"},
+                    {"name": "PyTorch Official Tutorials", "type": "documentation", "url": "https://pytorch.org/tutorials/", "cost": "Free", "time_estimate": "5 hours"}
+                ]
+            },
+            {
+                "focus_skill": "NLP & Transformers",
+                "task_list": [
+                    "Text preprocessing: tokenisation, embeddings (Word2Vec, GloVe) (2 hours)",
+                    "Transformer architecture: attention mechanism, positional encoding (3 hours)",
+                    "Fine-tune a HuggingFace model (BERT/DistilBERT) for text classification (2 hours)"
+                ],
+                "resources": [
+                    {"name": "HuggingFace NLP Course", "type": "course", "url": "https://huggingface.co/learn/nlp-course", "cost": "Free", "time_estimate": "8 hours"},
+                    {"name": "Attention Is All You Need paper", "type": "documentation", "url": "https://arxiv.org/abs/1706.03762", "cost": "Free", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "MLOps: Experiment Tracking & Model Serving",
+                "task_list": [
+                    "Track experiments with MLflow or Weights & Biases (2 hours)",
+                    "Package a model as a REST API with FastAPI (2 hours)",
+                    "Containerise with Docker and deploy to cloud (3 hours)"
+                ],
+                "resources": [
+                    {"name": "MLflow Official Docs", "type": "documentation", "url": "https://mlflow.org/docs/latest/index.html", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "Made With ML MLOps", "type": "tutorial", "url": "https://madewithml.com/", "cost": "Free", "time_estimate": "6 hours"}
+                ]
+            },
+            {
+                "focus_skill": "LLMs & Prompt Engineering",
+                "task_list": [
+                    "Understand LLM architecture: GPT, LLaMA, fine-tuning vs prompting (2 hours)",
+                    "Build a RAG pipeline with LangChain + vector DB (ChromaDB/Pinecone) (3 hours)",
+                    "Evaluate LLM outputs: BLEU, ROUGE, human eval frameworks (2 hours)"
+                ],
+                "resources": [
+                    {"name": "LangChain Documentation", "type": "documentation", "url": "https://python.langchain.com/docs/", "cost": "Free", "time_estimate": "4 hours"},
+                    {"name": "DeepLearning.AI ChatGPT Prompt Engineering", "type": "course", "url": "https://deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            }
+        ]
+        mastery = [
+            {
+                "focus_skill": "AI System Design & Scalability",
+                "task_list": [
+                    "Design a recommendation system: collaborative filtering, content-based (2 hours)",
+                    "ML system design patterns: feature stores, model registries, A/B testing (2 hours)",
+                    "Study real-world ML systems (Netflix, Uber, Spotify) architecture (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Designing ML Systems by Chip Huyen", "type": "book", "url": "https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/", "cost": "$50", "time_estimate": "10 hours"},
+                    {"name": "ML System Design Primer", "type": "tutorial", "url": "https://github.com/chiphuyen/machine-learning-systems-design", "cost": "Free", "time_estimate": "5 hours"}
+                ]
+            },
+            {
+                "focus_skill": "AI Portfolio & Kaggle Competitions",
+                "task_list": [
+                    "Complete 1 Kaggle competition end-to-end with write-up (3 hours)",
+                    "Build and document 2-3 AI projects on GitHub with README, results (2 hours)",
+                    "Write a technical blog post about your best project (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Kaggle Competitions", "type": "practice", "url": "https://kaggle.com/competitions", "cost": "Free", "time_estimate": "8 hours"},
+                    {"name": "GitHub Portfolio Guide", "type": "tutorial", "url": "https://github.com/topics/portfolio", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            },
+            {
+                "focus_skill": "AI/ML Interview Preparation",
+                "task_list": [
+                    "ML theory questions: bias-variance, regularisation, optimisers (2 hours)",
+                    "Coding interviews: implement ML algorithms from scratch (2 hours)",
+                    "Practice ML system design interviews (2 hours)"
+                ],
+                "resources": [
+                    {"name": "ML Interview Book by Chip Huyen", "type": "book", "url": "https://huyenchip.com/ml-interviews-book/", "cost": "Free", "time_estimate": "6 hours"},
+                    {"name": "LeetCode ML Problems", "type": "practice", "url": "https://leetcode.com", "cost": "Free/$", "time_estimate": "5 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Salary Negotiation & Job Applications",
+                "task_list": [
+                    "Craft AI-specific resume highlighting projects and metrics (1.5 hours)",
+                    "Practice behavioral interview: STAR format for AI project stories (2 hours)",
+                    "Learn salary negotiation strategies for ML/AI roles (1.5 hours)"
+                ],
+                "resources": [
+                    {"name": "Levels.fyi AI Salary Data", "type": "tutorial", "url": "https://levels.fyi", "cost": "Free", "time_estimate": "1 hour"},
+                    {"name": "Salary Negotiation Guide", "type": "tutorial", "url": "https://www.kalzumeus.com/2012/01/23/salary-negotiation/", "cost": "Free", "time_estimate": "1 hour"}
+                ]
+            }
+        ]
+        projects = [
+            {"name": "Sentiment Analysis API", "skills_demonstrated": ["NLP", "PyTorch", "FastAPI", "Docker"], "portfolio_value": "High"},
+            {"name": "Image Classifier with Grad-CAM Explainability", "skills_demonstrated": ["CNN", "PyTorch", "Model Interpretability"], "portfolio_value": "High"},
+            {"name": "RAG Chatbot with Custom Knowledge Base", "skills_demonstrated": ["LLM", "LangChain", "Vector DB", "Deployment"], "portfolio_value": "Very High"}
+        ]
+        phase_descriptions = [
+            "Master Python for data science, core math, and ML fundamentals",
+            "Build deep learning models, deploy ML systems, and work with LLMs",
+            "Design production AI systems, build portfolio, and prepare for interviews"
+        ]
+
+    # ── Web Developer ────────────────────────────────────────────────────
+    elif role == "Web Developer":
+        foundation = [
+            {
+                "focus_skill": "HTML5 & Semantic Web Structure",
+                "task_list": [
+                    "Learn HTML5 elements: header, nav, main, section, article, aside (2 hours)",
+                    "Forms and validation: input types, required, pattern attributes (2 hours)",
+                    "Build 3 static pages: landing page, blog layout, contact form (3 hours)"
+                ],
+                "resources": [
+                    {"name": "MDN HTML Guide", "type": "documentation", "url": "https://developer.mozilla.org/en-US/docs/Learn/HTML", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "freeCodeCamp Responsive Web Design", "type": "course", "url": "https://freecodecamp.org/learn/2022/responsive-web-design/", "cost": "Free", "time_estimate": "5 hours"}
+                ]
+            },
+            {
+                "focus_skill": "CSS3: Layouts, Flexbox, Grid & Responsive Design",
+                "task_list": [
+                    "CSS Flexbox: align, justify, wrap, flex-grow/shrink/basis (2 hours)",
+                    "CSS Grid: template areas, auto-fit, minmax for responsive layouts (2 hours)",
+                    "Media queries + mobile-first design: build responsive navbar + hero section (3 hours)"
+                ],
+                "resources": [
+                    {"name": "CSS Tricks Flexbox Guide", "type": "tutorial", "url": "https://css-tricks.com/snippets/css/a-guide-to-flexbox/", "cost": "Free", "time_estimate": "2 hours"},
+                    {"name": "Kevin Powell YouTube CSS", "type": "video", "url": "https://youtube.com/@KevinPowell", "cost": "Free", "time_estimate": "4 hours"}
+                ]
+            },
+            {
+                "focus_skill": "JavaScript Fundamentals & DOM",
+                "task_list": [
+                    "Variables, functions, arrays, objects, template literals, destructuring (3 hours)",
+                    "DOM manipulation: querySelector, addEventListener, dynamic content creation (2 hours)",
+                    "Build interactive features: tabs, modal, accordion, form validation (2 hours)"
+                ],
+                "resources": [
+                    {"name": "JavaScript.info Modern Tutorial", "type": "tutorial", "url": "https://javascript.info/", "cost": "Free", "time_estimate": "6 hours"},
+                    {"name": "MDN JavaScript Guide", "type": "documentation", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide", "cost": "Free", "time_estimate": "4 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Advanced JS: Async, ES6+, Fetch API",
+                "task_list": [
+                    "Promises, async/await, error handling with try/catch (2 hours)",
+                    "Fetch API: GET/POST requests, JSON parsing, loading states (2 hours)",
+                    "Build a weather app consuming a public API (3 hours)"
+                ],
+                "resources": [
+                    {"name": "JavaScript30 by Wes Bos", "type": "course", "url": "https://javascript30.com/", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "Traversy Media Fetch API", "type": "video", "url": "https://youtube.com/@TraversyMedia", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            }
+        ]
+        building = [
+            {
+                "focus_skill": "React.js: Components, State & Hooks",
+                "task_list": [
+                    "JSX, functional components, props, conditional rendering (2 hours)",
+                    "useState, useEffect, useContext: build a task manager app (3 hours)",
+                    "React Router: multi-page SPA navigation, nested routes (2 hours)"
+                ],
+                "resources": [
+                    {"name": "React Official Tutorial", "type": "documentation", "url": "https://react.dev/learn", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "Scrimba React Course", "type": "course", "url": "https://scrimba.com/learn/learnreact", "cost": "Free", "time_estimate": "8 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Node.js & Express Backend Development",
+                "task_list": [
+                    "Node.js fundamentals: modules, npm, file system, event loop (2 hours)",
+                    "Express.js: routing, middleware, error handling, REST API endpoints (3 hours)",
+                    "Build a CRUD REST API with Express + connect to MongoDB (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Node.js Official Getting Started", "type": "documentation", "url": "https://nodejs.org/en/learn/getting-started/introduction-to-nodejs", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "The Odin Project Node.js Path", "type": "course", "url": "https://theodinproject.com/paths/full-stack-javascript/courses/nodejs", "cost": "Free", "time_estimate": "10 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Databases: SQL & MongoDB",
+                "task_list": [
+                    "SQL fundamentals: SELECT, JOIN, GROUP BY, subqueries with PostgreSQL (2 hours)",
+                    "MongoDB: CRUD operations, Mongoose ODM, schema design (2 hours)",
+                    "Build a full-stack app with database: user registration + data storage (3 hours)"
+                ],
+                "resources": [
+                    {"name": "SQLBolt Interactive Tutorial", "type": "tutorial", "url": "https://sqlbolt.com/", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "MongoDB University Free Courses", "type": "course", "url": "https://university.mongodb.com/", "cost": "Free", "time_estimate": "5 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Authentication, Testing & Deployment",
+                "task_list": [
+                    "JWT authentication: sign-up, login, protected routes (2 hours)",
+                    "Testing: Jest unit tests + React Testing Library for components (2 hours)",
+                    "Deploy full-stack app: frontend on Vercel, backend on Render.com (3 hours)"
+                ],
+                "resources": [
+                    {"name": "JWT.io Introduction", "type": "documentation", "url": "https://jwt.io/introduction", "cost": "Free", "time_estimate": "1 hour"},
+                    {"name": "Vercel Deployment Guide", "type": "documentation", "url": "https://vercel.com/docs", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            }
+        ]
+        mastery = [
+            {
+                "focus_skill": "TypeScript & Next.js",
+                "task_list": [
+                    "TypeScript basics: types, interfaces, generics, type narrowing (2 hours)",
+                    "Next.js: SSR, SSG, API routes, file-based routing (3 hours)",
+                    "Convert your React project to Next.js + TypeScript (2 hours)"
+                ],
+                "resources": [
+                    {"name": "TypeScript Official Handbook", "type": "documentation", "url": "https://typescriptlang.org/docs/handbook/", "cost": "Free", "time_estimate": "4 hours"},
+                    {"name": "Next.js Learn Course", "type": "course", "url": "https://nextjs.org/learn", "cost": "Free", "time_estimate": "6 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Git, CI/CD & DevOps Basics",
+                "task_list": [
+                    "Git workflows: branching, pull requests, merge conflicts, rebasing (2 hours)",
+                    "GitHub Actions: automated testing + deployment pipeline (2 hours)",
+                    "Basic Docker: containerise your app, write a Dockerfile (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Git Official Docs", "type": "documentation", "url": "https://git-scm.com/doc", "cost": "Free", "time_estimate": "2 hours"},
+                    {"name": "GitHub Actions Guide", "type": "tutorial", "url": "https://docs.github.com/en/actions", "cost": "Free", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Portfolio Building & GitHub Profile",
+                "task_list": [
+                    "Polish 3-5 projects with live demos, clean code, detailed READMEs (2 hours)",
+                    "Build a personal portfolio website with Next.js and deploy (2 hours)",
+                    "Optimise GitHub profile: pinned repos, contribution graph, README profile (1 hour)"
+                ],
+                "resources": [
+                    {"name": "GitHub Profile README Guide", "type": "tutorial", "url": "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile", "cost": "Free", "time_estimate": "1 hour"},
+                    {"name": "Portfolio Inspiration", "type": "tutorial", "url": "https://github.com/topics/portfolio", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Web Dev Interview Preparation",
+                "task_list": [
+                    "Frontend interview: closures, event loop, virtual DOM, CSS specificity (2 hours)",
+                    "Take-home project practice: build a mini app in 4 hours (2 hours)",
+                    "Behavioral interviews: STAR format, salary negotiation (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Frontend Interview Handbook", "type": "tutorial", "url": "https://frontendinterviewhandbook.com/", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "GreatFrontEnd Practice", "type": "practice", "url": "https://greatfrontend.com/", "cost": "Free/$", "time_estimate": "6 hours"}
+                ]
+            }
+        ]
+        projects = [
+            {"name": "Responsive Portfolio Website", "skills_demonstrated": ["HTML/CSS", "JavaScript", "Responsive Design"], "portfolio_value": "High"},
+            {"name": "Full-Stack Task Manager (React + Node + MongoDB)", "skills_demonstrated": ["React", "Node.js", "MongoDB", "REST APIs", "Auth"], "portfolio_value": "Very High"},
+            {"name": "E-Commerce Store with Next.js", "skills_demonstrated": ["Next.js", "TypeScript", "Payment API", "Deployment"], "portfolio_value": "Very High"}
+        ]
+        phase_descriptions = [
+            "Master HTML, CSS, and JavaScript fundamentals",
+            "Build full-stack apps with React, Node.js, and databases",
+            "Learn TypeScript, Next.js, DevOps, and prepare for interviews"
+        ]
+
+    # ── Data Analyst ─────────────────────────────────────────────────────
+    elif role == "Data Analyst":
+        foundation = [
+            {
+                "focus_skill": "Excel & Google Sheets for Data Analysis",
+                "task_list": [
+                    "Advanced formulas: VLOOKUP, INDEX/MATCH, IF/SUMIFS, array formulas (2 hours)",
+                    "Pivot Tables: grouping, calculated fields, slicers for dashboards (2 hours)",
+                    "Build a sales dashboard in Google Sheets with charts and conditional formatting (3 hours)"
+                ],
+                "resources": [
+                    {"name": "Google Sheets Fundamentals", "type": "course", "url": "https://support.google.com/a/users/answer/9282959", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "ExcelJet Formula Guide", "type": "tutorial", "url": "https://exceljet.net/formulas", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            },
+            {
+                "focus_skill": "SQL for Data Analysis",
+                "task_list": [
+                    "SELECT, WHERE, GROUP BY, HAVING, ORDER BY on real datasets (2 hours)",
+                    "JOINs (INNER, LEFT, RIGHT, FULL), subqueries, CTEs (2 hours)",
+                    "Window functions: ROW_NUMBER, RANK, LAG/LEAD, running totals (3 hours)"
+                ],
+                "resources": [
+                    {"name": "SQLBolt Interactive Tutorial", "type": "tutorial", "url": "https://sqlbolt.com/", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "Mode Analytics SQL Tutorial", "type": "tutorial", "url": "https://mode.com/sql-tutorial/", "cost": "Free", "time_estimate": "4 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Python for Data Analysis (Pandas & NumPy)",
+                "task_list": [
+                    "Python basics for analysts: variables, loops, functions, file I/O (2 hours)",
+                    "Pandas: DataFrames, filtering, groupby, merge, pivot tables (3 hours)",
+                    "Clean a messy real-world dataset: handle nulls, datatypes, duplicates (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Kaggle Python Course", "type": "course", "url": "https://kaggle.com/learn/python", "cost": "Free", "time_estimate": "4 hours"},
+                    {"name": "Kaggle Pandas Course", "type": "course", "url": "https://kaggle.com/learn/pandas", "cost": "Free", "time_estimate": "4 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Statistics & Probability for Analysts",
+                "task_list": [
+                    "Descriptive statistics: mean, median, mode, standard deviation, percentiles (2 hours)",
+                    "Probability, distributions (normal, binomial), confidence intervals (2 hours)",
+                    "Hypothesis testing: t-tests, chi-square, p-values on a real dataset (3 hours)"
+                ],
+                "resources": [
+                    {"name": "Khan Academy Statistics", "type": "course", "url": "https://khanacademy.org/math/statistics-probability", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "StatQuest YouTube", "type": "video", "url": "https://youtube.com/@statquest", "cost": "Free", "time_estimate": "4 hours"}
+                ]
+            }
+        ]
+        building = [
+            {
+                "focus_skill": "Data Visualisation with Matplotlib, Seaborn & Plotly",
+                "task_list": [
+                    "Matplotlib: line, bar, scatter, histogram, subplots (2 hours)",
+                    "Seaborn: heatmaps, pair plots, violin plots for EDA (2 hours)",
+                    "Plotly: interactive dashboards with dropdowns and sliders (3 hours)"
+                ],
+                "resources": [
+                    {"name": "Kaggle Data Visualization Course", "type": "course", "url": "https://kaggle.com/learn/data-visualization", "cost": "Free", "time_estimate": "4 hours"},
+                    {"name": "Plotly Python Docs", "type": "documentation", "url": "https://plotly.com/python/", "cost": "Free", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Tableau / Power BI Dashboards",
+                "task_list": [
+                    "Tableau: connect data sources, build worksheets, create dashboards (3 hours)",
+                    "Calculated fields, parameters, filters, and dashboard actions (2 hours)",
+                    "Build a complete business dashboard from a dataset (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Tableau Free Training Videos", "type": "video", "url": "https://public.tableau.com/en-us/s/resources", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "Power BI Learning Path", "type": "course", "url": "https://learn.microsoft.com/en-us/training/powerplatform/power-bi", "cost": "Free", "time_estimate": "6 hours"}
+                ]
+            },
+            {
+                "focus_skill": "A/B Testing & Experiment Design",
+                "task_list": [
+                    "A/B testing methodology: hypothesis, sample size, significance level (2 hours)",
+                    "Implement an A/B test analysis in Python (t-test, chi-square, effect size) (2 hours)",
+                    "Case study: analyse a real A/B test result and write recommendations (3 hours)"
+                ],
+                "resources": [
+                    {"name": "Udacity A/B Testing Course", "type": "course", "url": "https://udacity.com/course/ab-testing--ud257", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "Evan Miller A/B Testing Calculator", "type": "tutorial", "url": "https://evanmiller.org/ab-testing/", "cost": "Free", "time_estimate": "1 hour"}
+                ]
+            },
+            {
+                "focus_skill": "Data Storytelling & Business Communication",
+                "task_list": [
+                    "Structure a data narrative: context, insight, recommendation, impact (2 hours)",
+                    "Build a stakeholder-ready presentation from a data analysis (2 hours)",
+                    "Practice presenting findings: 5-minute data story with visuals (3 hours)"
+                ],
+                "resources": [
+                    {"name": "Storytelling with Data by Cole Nussbaumer", "type": "book", "url": "https://storytellingwithdata.com/", "cost": "$30", "time_estimate": "6 hours"},
+                    {"name": "Google Data Analytics Certificate", "type": "course", "url": "https://coursera.org/professional-certificates/google-data-analytics", "cost": "Free to audit", "time_estimate": "10 hours"}
+                ]
+            }
+        ]
+        mastery = [
+            {
+                "focus_skill": "Advanced SQL & ETL Pipelines",
+                "task_list": [
+                    "Advanced SQL: window functions, CTEs, recursive queries, query optimisation (2 hours)",
+                    "ETL concepts: extract data from APIs, transform with Python, load to DB (2 hours)",
+                    "Build an automated data pipeline with Python + SQL (3 hours)"
+                ],
+                "resources": [
+                    {"name": "LeetCode SQL Problems", "type": "practice", "url": "https://leetcode.com/problemset/database/", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "DataCamp SQL Track", "type": "course", "url": "https://datacamp.com/tracks/sql-fundamentals", "cost": "$25/mo", "time_estimate": "6 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Intro to Machine Learning for Analysts",
+                "task_list": [
+                    "Regression and classification basics with scikit-learn (2 hours)",
+                    "Clustering (K-Means) and dimensionality reduction (PCA) (2 hours)",
+                    "Apply ML to a business problem: customer segmentation or churn prediction (3 hours)"
+                ],
+                "resources": [
+                    {"name": "Kaggle Intro to ML", "type": "course", "url": "https://kaggle.com/learn/intro-to-machine-learning", "cost": "Free", "time_estimate": "4 hours"},
+                    {"name": "Scikit-learn Tutorials", "type": "documentation", "url": "https://scikit-learn.org/stable/tutorial/", "cost": "Free", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Data Analyst Portfolio & Case Studies",
+                "task_list": [
+                    "Complete 2-3 end-to-end analysis projects with write-ups (3 hours)",
+                    "Create a portfolio on GitHub/Notion with dashboards and insights (2 hours)",
+                    "Write Medium/blog posts explaining your analysis process (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Kaggle Datasets", "type": "practice", "url": "https://kaggle.com/datasets", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "Tableau Public Gallery", "type": "tutorial", "url": "https://public.tableau.com/app/discover", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Data Analyst Interview Preparation",
+                "task_list": [
+                    "SQL interview questions: practice 20+ LeetCode/HackerRank SQL problems (2 hours)",
+                    "Case study interviews: analyse a dataset and present findings in 30 min (2 hours)",
+                    "Behavioral interviews: STAR format, salary negotiation (2 hours)"
+                ],
+                "resources": [
+                    {"name": "DataLemur SQL Interview Questions", "type": "practice", "url": "https://datalemur.com/", "cost": "Free", "time_estimate": "5 hours"},
+                    {"name": "Glassdoor Data Analyst Questions", "type": "tutorial", "url": "https://glassdoor.com", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            }
+        ]
+        projects = [
+            {"name": "Sales Dashboard in Tableau/Power BI", "skills_demonstrated": ["SQL", "Data Viz", "Business Analysis"], "portfolio_value": "High"},
+            {"name": "Customer Churn Analysis (Python + ML)", "skills_demonstrated": ["Pandas", "Scikit-learn", "Data Storytelling"], "portfolio_value": "Very High"},
+            {"name": "A/B Test Analysis Report", "skills_demonstrated": ["Statistics", "Python", "Business Communication"], "portfolio_value": "High"}
+        ]
+        phase_descriptions = [
+            "Master Excel, SQL, Python for data, and statistics fundamentals",
+            "Build dashboards, run A/B tests, and communicate data insights",
+            "Advanced SQL, intro ML, build portfolio, and prepare for interviews"
+        ]
+
+    # ── Career Re-entry into Tech ────────────────────────────────────────
+    else:
+        foundation = [
+            {
+                "focus_skill": "Tech Landscape & Career Direction",
+                "task_list": [
+                    "Overview of tech roles: front-end, back-end, data, AI, DevOps (2 hours)",
+                    "Self-assessment: identify transferable skills from previous career (2 hours)",
+                    "Research 10 job postings in your target area, list common requirements (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Roadmap.sh Career Paths", "type": "tutorial", "url": "https://roadmap.sh/", "cost": "Free", "time_estimate": "2 hours"},
+                    {"name": "freeCodeCamp Career Guide", "type": "tutorial", "url": "https://freecodecamp.org/news/", "cost": "Free", "time_estimate": "2 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Programming Fundamentals (Python)",
+                "task_list": [
+                    "Install Python, VS Code, set up first project (1 hour)",
+                    "Python basics: variables, data types, if/else, loops, functions (3 hours)",
+                    "Build a simple CLI project: calculator or to-do list (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Python Official Tutorial", "type": "documentation", "url": "https://docs.python.org/3/tutorial/", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "Automate the Boring Stuff with Python", "type": "book", "url": "https://automatetheboringstuff.com/", "cost": "Free", "time_estimate": "8 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Git, GitHub & Developer Tools",
+                "task_list": [
+                    "Install Git, create GitHub account, set up SSH keys (1 hour)",
+                    "Git basics: init, add, commit, push, pull, branching (2 hours)",
+                    "Push 3 small practice projects to GitHub (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Git Official Docs", "type": "documentation", "url": "https://git-scm.com/doc", "cost": "Free", "time_estimate": "2 hours"},
+                    {"name": "GitHub Skills", "type": "course", "url": "https://skills.github.com/", "cost": "Free", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Web Basics & Tech Communication",
+                "task_list": [
+                    "HTML/CSS fundamentals: structure, styling, responsiveness basics (2 hours)",
+                    "How the internet works: HTTP, DNS, servers, APIs - conceptual overview (1 hour)",
+                    "Practice tech communication: write a blog post about what you learned this week (1 hour)"
+                ],
+                "resources": [
+                    {"name": "MDN Getting Started with the Web", "type": "documentation", "url": "https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "freeCodeCamp Responsive Web Design", "type": "course", "url": "https://freecodecamp.org/learn/2022/responsive-web-design/", "cost": "Free", "time_estimate": "5 hours"}
+                ]
+            }
+        ]
+        building = [
+            {
+                "focus_skill": "Career Gap Narrative & Confidence Building",
+                "task_list": [
+                    "Craft your career transition story: why tech, what you bring, where you aim (2 hours)",
+                    "Identify 5 transferable skills and map them to tech roles (1 hour)",
+                    "Join 2 tech communities: Discord, Reddit, Women Who Code, etc. (1 hour)"
+                ],
+                "resources": [
+                    {"name": "Women Who Code", "type": "community", "url": "https://womenwhocode.com/", "cost": "Free", "time_estimate": "1 hour"},
+                    {"name": "LinkedIn Career Transition Articles", "type": "tutorial", "url": "https://linkedin.com/learning/", "cost": "Free/$", "time_estimate": "2 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Deepen Your Chosen Specialisation",
+                "task_list": [
+                    "Pick your track: Web Dev, Data, or AI and start the focused curriculum (3 hours)",
+                    "Complete 1 guided project in your chosen area (2 hours)",
+                    "Build a small portfolio piece demonstrating your new skills (2 hours)"
+                ],
+                "resources": [
+                    {"name": "The Odin Project (Web)", "type": "course", "url": "https://theodinproject.com/", "cost": "Free", "time_estimate": "10 hours"},
+                    {"name": "Kaggle Learn (Data/AI)", "type": "course", "url": "https://kaggle.com/learn", "cost": "Free", "time_estimate": "8 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Projects & Practical Experience",
+                "task_list": [
+                    "Build a project that solves a real problem you care about (3 hours)",
+                    "Document the project with a clear README and screenshots (1 hour)",
+                    "Deploy the project online (Vercel, Render, or GitHub Pages) (2 hours)"
+                ],
+                "resources": [
+                    {"name": "GitHub Pages", "type": "documentation", "url": "https://pages.github.com/", "cost": "Free", "time_estimate": "1 hour"},
+                    {"name": "Render.com Free Tier", "type": "documentation", "url": "https://render.com/", "cost": "Free", "time_estimate": "1 hour"}
+                ]
+            },
+            {
+                "focus_skill": "Networking & Online Presence",
+                "task_list": [
+                    "Optimise LinkedIn: headline, summary, skills, featured projects (2 hours)",
+                    "Contribute to 1 open-source beginner-friendly project (2 hours)",
+                    "Attend 1 virtual tech meetup or conference (1 hour)"
+                ],
+                "resources": [
+                    {"name": "Good First Issues", "type": "practice", "url": "https://goodfirstissues.com/", "cost": "Free", "time_estimate": "2 hours"},
+                    {"name": "Meetup.com Tech Events", "type": "community", "url": "https://meetup.com/", "cost": "Free", "time_estimate": "1 hour"}
+                ]
+            }
+        ]
+        mastery = [
+            {
+                "focus_skill": "Advanced Project & Portfolio Polish",
+                "task_list": [
+                    "Build 1 capstone project combining multiple skills (3 hours)",
+                    "Create a personal website/portfolio showcasing all projects (2 hours)",
+                    "Get code review feedback from community or mentor (1 hour)"
+                ],
+                "resources": [
+                    {"name": "Portfolio Inspiration", "type": "tutorial", "url": "https://github.com/topics/portfolio", "cost": "Free", "time_estimate": "2 hours"},
+                    {"name": "Code Review Stack Exchange", "type": "community", "url": "https://codereview.stackexchange.com/", "cost": "Free", "time_estimate": "1 hour"}
+                ]
+            },
+            {
+                "focus_skill": "Resume, Cover Letter & Job Applications",
+                "task_list": [
+                    "Write a tech-focused resume highlighting projects and transferable skills (2 hours)",
+                    "Customise cover letter template for 3 target job types (1 hour)",
+                    "Apply to 5 entry-level or returner-friendly positions (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Tech Resume Guide", "type": "tutorial", "url": "https://resumeworded.com/", "cost": "Free/$", "time_estimate": "2 hours"},
+                    {"name": "Return-to-Work Programs List", "type": "tutorial", "url": "https://rewritingthecode.org/", "cost": "Free", "time_estimate": "1 hour"}
+                ]
+            },
+            {
+                "focus_skill": "Interview Preparation",
+                "task_list": [
+                    "Behavioral interview prep: STAR format for career transition stories (2 hours)",
+                    "Technical interview basics: problem-solving walkthroughs (2 hours)",
+                    "Mock interview practice with a friend or on Pramp.com (2 hours)"
+                ],
+                "resources": [
+                    {"name": "Pramp Free Mock Interviews", "type": "practice", "url": "https://pramp.com/", "cost": "Free", "time_estimate": "3 hours"},
+                    {"name": "Interview.io", "type": "practice", "url": "https://interviewing.io/", "cost": "Free/$", "time_estimate": "3 hours"}
+                ]
+            },
+            {
+                "focus_skill": "Salary Negotiation & Career Growth Plan",
+                "task_list": [
+                    "Research salary ranges for your target role on Levels.fyi / Glassdoor (1 hour)",
+                    "Practice negotiation scripts: initial offer, counter, benefits (2 hours)",
+                    "Create a 6-month post-hire growth plan for continuous learning (1 hour)"
+                ],
+                "resources": [
+                    {"name": "Levels.fyi Salary Data", "type": "tutorial", "url": "https://levels.fyi", "cost": "Free", "time_estimate": "1 hour"},
+                    {"name": "Salary Negotiation Guide", "type": "tutorial", "url": "https://www.kalzumeus.com/2012/01/23/salary-negotiation/", "cost": "Free", "time_estimate": "1 hour"}
+                ]
+            }
+        ]
+        projects = [
+            {"name": "Personal Portfolio Website", "skills_demonstrated": ["HTML/CSS", "Git", "Deployment"], "portfolio_value": "High"},
+            {"name": "Project in Chosen Specialisation", "skills_demonstrated": ["Specialisation skills", "Problem solving"], "portfolio_value": "Very High"},
+            {"name": "Open Source Contribution", "skills_demonstrated": ["Git", "Collaboration", "Code reading"], "portfolio_value": "High"}
+        ]
+        phase_descriptions = [
+            "Explore tech roles, learn programming fundamentals, and set up developer tools",
+            "Build confidence, deepen your specialisation, and create first projects",
+            "Polish portfolio, prepare for interviews, and start applying"
+        ]
+
+    return {
+        "foundation": foundation,
+        "building": building,
+        "mastery": mastery,
+        "projects": projects,
+        "phase_descriptions": phase_descriptions
+    }
+
+
 def get_fallback_roadmap(
     role: str,
     weekly_hours: int,
     deadline_weeks: Optional[int]
 ) -> Dict[str, Any]:
-    """Generate a comprehensive fallback roadmap if LLM fails."""
-    
+    """Generate a role-specific fallback roadmap if LLM fails."""
+
     # Calculate weeks
     if deadline_weeks:
         total_weeks = deadline_weeks
     else:
         total_hours_needed = 200
         total_weeks = max(12, min(52, total_hours_needed // weekly_hours))
-    
+
     # Divide into phases
     foundation_weeks = total_weeks // 3
     building_weeks = total_weeks // 3
     mastery_weeks = total_weeks - foundation_weeks - building_weeks
-    
-    # Real skill progression for AI Engineer / Data roles
-    foundation_skills = [
-        {
-            "focus_skill": "Python Basics & Environment Setup",
-            "task_list": [
-                "Install Python 3.11+ and set up development environment (2 hours)",
-                "Learn Python syntax: variables, data types, operators (3 hours)",
-                "Complete 20+ practice problems (2 hours)"
-            ],
-            "resources": [
-                {"name": "Python Official Tutorial", "type": "documentation", "url": "https://docs.python.org/3/tutorial/", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "Codecademy Python Course", "type": "course", "url": "https://codecademy.com", "cost": "Free/$20/month", "time_estimate": "4 hours"},
-                {"name": "LeetCode Easy Problems", "type": "practice", "url": "https://leetcode.com", "cost": "Free", "time_estimate": "3 hours"}
-            ]
-        },
-        {
-            "focus_skill": "Data Structures: Lists, Dicts, Sets & Time Complexity",
-            "task_list": [
-                "Study lists, dictionaries, tuples in Python (2 hours)",
-                "Learn Big O notation and time complexity analysis (2 hours)",
-                "Solve 15+ problems on Arrays/Strings (3 hours)"
-            ],
-            "resources": [
-                {"name": "Data Structures Visualization", "type": "tutorial", "url": "https://visualgo.net/", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "LeetCode Array Problems", "type": "practice", "url": "https://leetcode.com/tag/array/", "cost": "Free/$", "time_estimate": "4 hours"},
-                {"name": "GeeksforGeeks DSA Course", "type": "course", "url": "https://geeksforgeeks.org", "cost": "Free", "time_estimate": "3 hours"}
-            ]
-        },
-        {
-            "focus_skill": "Sorting, Searching & Problem-Solving",
-            "task_list": [
-                "Master sorting algorithms (merge, quick, heap sort) (2 hours)",
-                "Learn binary search and two-pointer technique (2 hours)",
-                "Solve 20+ coding problems implementing these concepts (3 hours)"
-            ],
-            "resources": [
-                {"name": "Algorithms Course by MIT", "type": "video", "url": "https://ocw.mit.edu/courses/introduction-to-algorithms/", "cost": "Free", "time_estimate": "4 hours"},
-                {"name": "LeetCode Medium Problems", "type": "practice", "url": "https://leetcode.com", "cost": "Free/$", "time_estimate": "5 hours"},
-                {"name": "Neetcode.io", "type": "tutorial", "url": "https://neetcode.io/", "cost": "Free/$50", "time_estimate": "3 hours"}
-            ]
-        },
-        {
-            "focus_skill": "Recursion & Backtracking",
-            "task_list": [
-                "Understand recursive function design and call stack (2 hours)",
-                "Master backtracking patterns (2 hours)",
-                "Solve tree/graph recursion problems (3 hours)"
-            ],
-            "resources": [
-                {"name": "Recursion Explained", "type": "tutorial", "url": "https://brilliant.org/courses/recursion/", "cost": "Free/$15/month", "time_estimate": "3 hours"},
-                {"name": "LeetCode Tree & Backtracking", "type": "practice", "url": "https://leetcode.com", "cost": "$", "time_estimate": "4 hours"}
-            ]
-        }
-    ]
-    
-    building_skills = [
-        {
-            "focus_skill": "Web Development Fundamentals (HTML, CSS, JavaScript)",
-            "task_list": [
-                "Learn HTML5 semantics and structure (1.5 hours)",
-                "Learn CSS3: flexbox, grid, responsive design (2 hours)",
-                "JavaScript basics: DOM manipulation, events (1.5 hours)"
-            ],
-            "resources": [
-                {"name": "MDN Web Docs", "type": "documentation", "url": "https://developer.mozilla.org/", "cost": "Free", "time_estimate": "4 hours"},
-                {"name": "freeCodeCamp Responsive Design", "type": "video", "url": "https://freecodecamp.org", "cost": "Free", "time_estimate": "4 hours"},
-                {"name": "Codecademy JavaScript Course", "type": "course", "url": "https://codecademy.com", "cost": "Free/$20", "time_estimate": "5 hours"}
-            ]
-        },
-        {
-            "focus_skill": "Backend Development (Python Flask/FastAPI)",
-            "task_list": [
-                "Learn web frameworks: routing, requests, responses (1.5 hours)",
-                "Build REST APIs with Flask or FastAPI (2 hours)",
-                "Deploy to cloud platform (Heroku/Vercel) (1.5 hours)"
-            ],
-            "resources": [
-                {"name": "Miguel Grinberg Flask Tutorial", "type": "tutorial", "url": "https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world", "cost": "Free", "time_estimate": "4 hours"},
-                {"name": "FastAPI Official Docs", "type": "documentation", "url": "https://fastapi.tiangolo.com/", "cost": "Free", "time_estimate": "3 hours"},
-                {"name": "REST API Course", "type": "course", "url": "https://udemy.com", "cost": "$10-15", "time_estimate": "5 hours"}
-            ]
-        },
-        {
-            "focus_skill": "Databases (SQL & NoSQL)",
-            "task_list": [
-                "SQL fundamentals: SELECT, JOIN, GROUP BY (2 hours)",
-                "Database design and normalization (1.5 hours)",
-                "Work with PostgreSQL or MongoDB (1.5 hours)"
-            ],
-            "resources": [
-                {"name": "SQL Tutorial by Mode Analytics", "type": "tutorial", "url": "https://mode.com/sql-tutorial/", "cost": "Free", "time_estimate": "3 hours"},
-                {"name": "PostgreSQL Official Docs", "type": "documentation", "url": "https://postgresql.org/docs/", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "Udemy Database Design", "type": "course", "url": "https://udemy.com", "cost": "$10-15", "time_estimate": "5 hours"}
-            ]
-        },
-        {
-            "focus_skill": "APIs & Integration",
-            "task_list": [
-                "Design and build RESTful APIs (2 hours)",
-                "Work with external APIs (payment, maps, auth) (1.5 hours)",
-                "Testing and API documentation (1.5 hours)"
-            ],
-            "resources": [
-                {"name": "REST API Best Practices", "type": "tutorial", "url": "https://restfulapi.net/", "cost": "Free", "time_estimate": "3 hours"},
-                {"name": "Postman API Learning", "type": "tutorial", "url": "https://learning.postman.com/", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "API Design Course", "type": "course", "url": "https://udemy.com", "cost": "$10-15", "time_estimate": "4 hours"}
-            ]
-        }
-    ]
-    
-    mastery_skills = [
-        {
-            "focus_skill": "System Design & Architecture",
-            "task_list": [
-                "Learn scalability concepts: sharding, caching, CDN (2 hours)",
-                "Design patterns and microservices (1.5 hours)",
-                "Analyze real-world system designs (1.5 hours)"
-            ],
-            "resources": [
-                {"name": "System Design Primer", "type": "tutorial", "url": "https://github.com/donnemartin/system-design-primer", "cost": "Free", "time_estimate": "5 hours"},
-                {"name": "Grokking the System Design Interview", "type": "course", "url": "https://designgurus.org/", "cost": "$50-100", "time_estimate": "8 hours"},
-                {"name": "Designing Data-Intensive Applications", "type": "book", "url": "https://dataintensive.net/", "cost": "$50", "time_estimate": "10 hours"}
-            ]
-        },
-        {
-            "focus_skill": "CI/CD, DevOps & Cloud",
-            "task_list": [
-                "Learn Git workflows and GitHub (1.5 hours)",
-                "Set up CI/CD pipelines (GitHub Actions, Jenkins) (1.5 hours)",
-                "Deploy to AWS/GCP/Azure (1.5 hours)"
-            ],
-            "resources": [
-                {"name": "Git Official Docs", "type": "documentation", "url": "https://git-scm.com/doc", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "GitHub Actions Guide", "type": "tutorial", "url": "https://github.com/features/actions", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "AWS Associate Developer Cert", "type": "course", "url": "https://aws.amazon.com/certification/", "cost": "$50-150", "time_estimate": "20 hours"}
-            ]
-        },
-        {
-            "focus_skill": "Portfolio Building & Demonstration",
-            "task_list": [
-                "Refine GitHub portfolio with 3-5 strong projects (2 hours)",
-                "Create project documentation and READMEs (1 hour)",
-                "Build personal website showcasing work (1 hour)"
-            ],
-            "resources": [
-                {"name": "GitHub Portfolio Guide", "type": "tutorial", "url": "https://github.com/topics/portfolio", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "Portfolio Code Examples", "type": "practice", "url": "https://github.com", "cost": "Free", "time_estimate": "5 hours"}
-            ]
-        },
-        {
-            "focus_skill": "Interview Preparation & Negotiation",
-            "task_list": [
-                "Practice behavioral interview questions (1.5 hours)",
-                "Mock technical interviews (2 hours)",
-                "Learn salary negotiation and offer evaluation (1 hour)"
-            ],
-            "resources": [
-                {"name": "Behavioral Interview Guide", "type": "tutorial", "url": "https://thebalancecareers.com/behavioral-interview-questions-and-answers-2061629", "cost": "Free", "time_estimate": "2 hours"},
-                {"name": "LeetCode Mock Interviews", "type": "practice", "url": "https://leetcode.com", "cost": "$", "time_estimate": "8 hours"},
-                {"name": "Salary Negotiation Guide", "type": "book", "url": "https://www.kalzumeus.com/2012/01/23/salary-negotiation/", "cost": "Free", "time_estimate": "1 hour"}
-            ]
-        }
-    ]
-    
+
+    # Get role-specific skills
+    role_data = _get_role_specific_skills(role)
+    foundation_skills = role_data["foundation"]
+    building_skills = role_data["building"]
+    mastery_skills = role_data["mastery"]
+    projects = role_data["projects"]
+    phase_descriptions = role_data["phase_descriptions"]
+
     # Build phases with calculated weeks
     def create_weeks(skills_list, start_week_number):
         weeks_data = []
         week_num = start_week_number
-        for i, skill in enumerate(skills_list[:len(skills_list)]):
+        for skill in skills_list:
             weeks_data.append({
                 "week_number": week_num,
                 "focus_skill": skill["focus_skill"],
@@ -412,48 +929,38 @@ def get_fallback_roadmap(
             })
             week_num += 1
         return weeks_data
-    
+
     phases = [
         {
             "phase_name": "Phase 1: Foundation",
-            "phase_description": "Master Python fundamentals and core algorithmic concepts",
+            "phase_description": phase_descriptions[0],
             "weeks": create_weeks(foundation_skills, 1)
         },
         {
             "phase_name": "Phase 2: Application",
-            "phase_description": "Build real-world projects with web technologies and databases",
+            "phase_description": phase_descriptions[1],
             "weeks": create_weeks(building_skills, 1 + foundation_weeks)
         },
         {
             "phase_name": "Phase 3: Mastery & Interview Prep",
-            "phase_description": "Polish your portfolio and prepare for technical interviews",
+            "phase_description": phase_descriptions[2],
             "weeks": create_weeks(mastery_skills, 1 + foundation_weeks + building_weeks)
         }
     ]
-    
+
+    # Add week ranges to projects
+    for i, project in enumerate(projects):
+        if i == 0:
+            project["week_range"] = f"Weeks 1-{foundation_weeks}"
+        elif i == 1:
+            project["week_range"] = f"Weeks {foundation_weeks+1}-{foundation_weeks+building_weeks}"
+        else:
+            project["week_range"] = f"Weeks {foundation_weeks+building_weeks+1}-{total_weeks}"
+
     return {
         "total_weeks": total_weeks,
         "phases": phases,
-        "recommended_projects": [
-            {
-                "name": "CLI Todo App",
-                "week_range": f"Weeks 1-{foundation_weeks}",
-                "skills_demonstrated": ["Python basics", "Data structures", "File I/O"],
-                "portfolio_value": "Medium"
-            },
-            {
-                "name": "Blog/Portfolio Website",
-                "week_range": f"Weeks {foundation_weeks+1}-{foundation_weeks+building_weeks//2}",
-                "skills_demonstrated": ["HTML/CSS/JavaScript", "Python backend", "Database design"],
-                "portfolio_value": "High"
-            },
-            {
-                "name": "Full-Stack Project (Social App, E-Commerce, etc)",
-                "week_range": f"Weeks {foundation_weeks+building_weeks//2+1}-{foundation_weeks+building_weeks}",
-                "skills_demonstrated": ["Full stack development", "APIs", "Deployment"],
-                "portfolio_value": "Very High"
-            }
-        ],
+        "recommended_projects": projects,
         "interview_prep_weeks": list(range(total_weeks - 3, total_weeks + 1)),
         "buffer_weeks": 2
     }

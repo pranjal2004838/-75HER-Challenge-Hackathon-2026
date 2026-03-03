@@ -89,12 +89,161 @@ def _render_step_goal():
             st.rerun()
 
 
+def _get_level_descriptions(role: str) -> dict:
+    """Return role-specific skill level descriptions so users can self-assess."""
+
+    if role == "AI Engineer":
+        return {
+            "Beginner": {
+                "label": "No AI/ML experience yet",
+                "skills": (
+                    "Choose this if you:\n"
+                    "- Have little or no programming experience\n"
+                    "- Haven't worked with Python, NumPy, or Pandas\n"
+                    "- Don't know what machine learning or neural networks are\n"
+                    "- Are starting completely from scratch"
+                )
+            },
+            "Intermediate": {
+                "label": "Comfortable with Python & basic ML",
+                "skills": (
+                    "Choose this if you know:\n"
+                    "- **Python** (functions, loops, OOP basics)\n"
+                    "- **NumPy / Pandas** for data manipulation\n"
+                    "- **Scikit-learn** basics (linear regression, decision trees)\n"
+                    "- Basic **statistics** (mean, median, distributions)\n"
+                    "- Have trained at least one ML model"
+                )
+            },
+            "Advanced": {
+                "label": "Strong ML skills, ready to specialise",
+                "skills": (
+                    "Choose this if you know:\n"
+                    "- **PyTorch or TensorFlow** (CNNs, RNNs, training loops)\n"
+                    "- **Deep Learning** concepts (backprop, optimisers, regularisation)\n"
+                    "- **NLP or Computer Vision** fundamentals\n"
+                    "- **MLOps** basics (experiment tracking, model deployment)\n"
+                    "- Have built and deployed ML models"
+                )
+            }
+        }
+
+    elif role == "Web Developer":
+        return {
+            "Beginner": {
+                "label": "No web development experience yet",
+                "skills": (
+                    "Choose this if you:\n"
+                    "- Have never built a website or web app\n"
+                    "- Don't know HTML, CSS, or JavaScript\n"
+                    "- Are not familiar with how websites work\n"
+                    "- Are starting completely from scratch"
+                )
+            },
+            "Intermediate": {
+                "label": "Comfortable with HTML/CSS/JS & frontend basics",
+                "skills": (
+                    "Choose this if you know:\n"
+                    "- **HTML & CSS** (can build responsive layouts)\n"
+                    "- **JavaScript** (DOM manipulation, events, async/await)\n"
+                    "- A **frontend framework** like React, Vue, or Angular (basics)\n"
+                    "- **Git** for version control\n"
+                    "- Have built at least one interactive website"
+                )
+            },
+            "Advanced": {
+                "label": "Strong full-stack skills, ready to level up",
+                "skills": (
+                    "Choose this if you know:\n"
+                    "- **React / Vue / Angular** (state management, routing, hooks)\n"
+                    "- **Node.js / Express** or another backend framework\n"
+                    "- **Databases** (SQL or MongoDB, CRUD operations)\n"
+                    "- **REST APIs** (design and consume)\n"
+                    "- Have built and deployed full-stack apps"
+                )
+            }
+        }
+
+    elif role == "Data Analyst":
+        return {
+            "Beginner": {
+                "label": "No data analysis experience yet",
+                "skills": (
+                    "Choose this if you:\n"
+                    "- Have basic Excel / Google Sheets knowledge only\n"
+                    "- Don't know SQL or Python\n"
+                    "- Haven't worked with datasets or dashboards\n"
+                    "- Are starting completely from scratch"
+                )
+            },
+            "Intermediate": {
+                "label": "Comfortable with Excel/SQL & basic data tools",
+                "skills": (
+                    "Choose this if you know:\n"
+                    "- **Advanced Excel** (VLOOKUP, pivot tables, charts)\n"
+                    "- **SQL** (SELECT, JOIN, GROUP BY, filtering)\n"
+                    "- **Python basics** with Pandas for data manipulation\n"
+                    "- Basic **statistics** (mean, median, standard deviation)\n"
+                    "- Have analysed at least one real dataset"
+                )
+            },
+            "Advanced": {
+                "label": "Strong analytical skills, ready to specialise",
+                "skills": (
+                    "Choose this if you know:\n"
+                    "- **Advanced SQL** (window functions, CTEs, subqueries)\n"
+                    "- **Python** (Pandas, Matplotlib/Seaborn for visualisation)\n"
+                    "- **Tableau or Power BI** for dashboards\n"
+                    "- **A/B testing** and hypothesis testing concepts\n"
+                    "- Have built reports or dashboards for stakeholders"
+                )
+            }
+        }
+
+    else:  # Career Re-entry into Tech
+        return {
+            "Beginner": {
+                "label": "Starting fresh or been away from tech for a long time",
+                "skills": (
+                    "Choose this if you:\n"
+                    "- Have been away from tech for 2+ years\n"
+                    "- Need to refresh all technical skills\n"
+                    "- Are exploring which direction to take\n"
+                    "- Have non-tech professional experience to leverage"
+                )
+            },
+            "Intermediate": {
+                "label": "Some prior tech experience, returning after a break",
+                "skills": (
+                    "Choose this if you:\n"
+                    "- Worked in tech before but have been away for a while\n"
+                    "- Remember basics of programming or tech tools\n"
+                    "- Need to update skills to current industry standards\n"
+                    "- Can write basic code but need practice"
+                )
+            },
+            "Advanced": {
+                "label": "Strong prior tech background, short career break",
+                "skills": (
+                    "Choose this if you:\n"
+                    "- Had a senior/mid-level tech role before your break\n"
+                    "- Still comfortable with programming concepts\n"
+                    "- Mainly need to catch up on new tools and frameworks\n"
+                    "- Want to re-enter at a similar or higher level"
+                )
+            }
+        }
+
+
 def _render_step_level():
     """Step 2: Select current skill level."""
     st.subheader("What's your current skill level?")
     
     goal = st.session_state.onboarding_data.get('goal', 'this field')
     st.markdown(f"How would you rate your current skills related to **{goal}**?")
+
+    # Role-specific skill level descriptions
+    level_descriptions = _get_level_descriptions(goal)
     
     level = st.radio(
         "Select your level",
@@ -106,13 +255,14 @@ def _render_step_level():
     if level:
         st.session_state.onboarding_data['current_level'] = level
         
-        # Show level description
-        level_info = {
-            "Beginner": "Little to no experience. Starting from scratch.",
-            "Intermediate": "Some experience. Familiar with basics, need to fill gaps.",
-            "Advanced": "Strong foundation. Looking to specialize or update skills."
-        }
-        st.caption(level_info.get(level, ""))
+        # Show role-specific level description
+        desc = level_descriptions.get(level, {})
+        label = desc.get("label", level)
+        skills_text = desc.get("skills", "")
+        
+        st.caption(f"**{label}**")
+        if skills_text:
+            st.markdown(skills_text)
     
     col1, col2 = st.columns(2)
     with col1:

@@ -181,9 +181,6 @@ st.markdown("""
         color: white !important;
     }
     
-    /* JAVASCRIPT OVERRIDE: Force white text on all blue buttons */
-    /* This will be enforced by JS below since CSS alone is being overridden */
-    
     .stButton > button[kind="secondary"] {
         background: white !important;
         color: var(--text-primary) !important;
@@ -279,42 +276,58 @@ st.markdown("""
         letter-spacing: 0.05em;
     }
 </style>
+""", unsafe_allow_html=True)
 
+# JavaScript to force white text on blue buttons (CSS gets overridden by Streamlit's inline styles)
+st.markdown("""
 <script>
-// Force white text on blue buttons - CSS alone is being overridden by Streamlit
-document.addEventListener('DOMContentLoaded', function() {
-    applyButtonStyles();
-    // Re-apply styles when Streamlit reruns
-    const observer = new MutationObserver(applyButtonStyles);
-    observer.observe(document.body, { childList: true, subtree: true });
-});
-
-function applyButtonStyles() {
-    // Find all buttons with blue backgrounds and force white text
+// Function to apply white text to all blue buttons
+function forceWhiteTextOnBlueButtons() {
     const buttons = document.querySelectorAll('button');
-    const blueColors = [
-        'rgb(99, 102, 241)',   // Streamlit primary
-        'rgb(79, 70, 229)',    // Darker blue
-        'rgb(129, 140, 248)',  // Lighter blue
-        '#6366F1',             // Hex variants
-        '#4F46E5',
-        '#818CF8'
-    ];
-    
     buttons.forEach(button => {
-        const computedStyle = window.getComputedStyle(button);
-        const bgColor = computedStyle.backgroundColor;
-        const bgColorStyle = button.style.backgroundColor;
+        const bgColor = window.getComputedStyle(button).backgroundColor;
+        const inlineStyle = button.getAttribute('style') || '';
         
-        // Check if button has a blue background
-        if (blueColors.some(color => bgColor.includes(color.replace('rgb(', '').replace(')', '')) || bgColorStyle.includes(color))) {
-            button.style.color = 'white !important';
-            // Also target child elements
-            const span = button.querySelector('span');
-            if (span) span.style.color = 'white !important';
+        // Check if button has blue background (common Streamlit primary blue shades)
+        const isBlue = 
+            bgColor.includes('rgb(99, 102, 241)') || 
+            bgColor.includes('rgb(79, 70, 229)') ||
+            bgColor.includes('rgb(129, 140, 248)') ||
+            inlineStyle.includes('#6366F1') ||
+            inlineStyle.includes('#4F46E5') ||
+            inlineStyle.includes('#818CF8') ||
+            inlineStyle.includes('rgb(99, 102, 241)') ||
+            inlineStyle.includes('rgb(79, 70, 229)') ||
+            inlineStyle.includes('rgb(129, 140, 248)');
+        
+        if (isBlue) {
+            button.style.setProperty('color', 'white', 'important');
         }
     });
 }
+
+// Run immediately
+forceWhiteTextOnBlueButtons();
+
+// Watch for DOM changes (Streamlit re-renders)
+const observer = new MutationObserver(() => {
+    forceWhiteTextOnBlueButtons();
+});
+
+// Start observing the document body for changes
+observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['style', 'class']
+});
+
+// Also run on any button click
+document.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+        setTimeout(forceWhiteTextOnBlueButtons, 10);
+    }
+}, true);
 </script>
 """, unsafe_allow_html=True)
 

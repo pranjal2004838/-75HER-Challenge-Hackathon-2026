@@ -1,8 +1,27 @@
-streamlit==1.28.1
-firebase-admin==6.2.0
-google-cloud-firestore==2.14.0
-openai==1.3.0
-anthropic==0.7.0
-pydantic==2.5.0
-python-dotenv==1.0.0
-requests==2.31.0
+# HERPath AI - Requirements
+# Core Framework
+streamlit>=1.28.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# Firebase Integration
+firebase-admin>=6.2.0
+google-cloud-firestore>=2.14.0
+
+# LLM Providers (optional - we use direct Gemini REST API)
+# openai>=1.3.0
+# anthropic>=0.7.0
+
+# Goose Framework (Block's Agentic AI)
+# Note: goose-ai has Python 3.14 compatibility issues with langfuse/pydantic v1
+# Our custom Goose-style implementation in agents/goose/ provides equivalent functionality
+# goose-ai>=0.9.0
+
+# Data Processing
+numpy>=1.24.0
+
+# Utilities
+tenacity>=8.2.0
+attrs>=23.2.0
+

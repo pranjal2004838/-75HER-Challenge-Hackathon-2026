@@ -123,6 +123,7 @@ st.markdown("""
         border: 1px solid var(--border) !important;
     }
     
+    /* Primary buttons - blue background with white text */
     .stButton > button[kind="primary"] {
         background: var(--primary) !important;
         border-color: var(--primary) !important;
@@ -132,6 +133,52 @@ st.markdown("""
     .stButton > button[kind="primary"]:hover {
         background: var(--primary-dark) !important;
         border-color: var(--primary-dark) !important;
+        color: white !important;
+    }
+    
+    .stButton > button[kind="primary"]:focus {
+        color: white !important;
+        background: var(--primary) !important;
+    }
+    
+    .stButton > button[kind="primary"]:active {
+        color: white !important;
+        background: var(--primary-dark) !important;
+    }
+    
+    .stButton > button[kind="primary"]:focus-visible {
+        color: white !important;
+    }
+    
+    /* Ensure all blue background buttons have white text - multiple color variations */
+    .stButton > button[style*="background: var(--primary)"],
+    .stButton > button[style*="background-color: rgb(99, 102, 241)"],
+    .stButton > button[style*="background-color: rgb(79, 70, 229)"],
+    .stButton > button[style*="background-color: rgb(129, 140, 248)"],
+    .stButton > button[style*="#6366F1"],
+    .stButton > button[style*="#4F46E5"],
+    .stButton > button[style*="#818CF8"] {
+        color: white !important;
+    }
+    
+    /* Target any button with Streamlit's default primary blue color in any state */
+    button[style*="rgb(99, 102, 241)"],
+    button[style*="rgb(79, 70, 229)"],
+    button[style*="rgb(129, 140, 248)"],
+    button[style*="#6366F1"],
+    button[style*="#4F46E5"],
+    button[style*="#818CF8"] {
+        color: white !important;
+    }
+    
+    /* Super aggressive: any button that might have a blue background gets white text */
+    button:has(style*="background: rgb(99, 102, 241)"),
+    button:has(style*="background: rgb(79, 70, 229)"),
+    button:has(style*="background: rgb(129, 140, 248)"),
+    button:has(style*="background: #6366F1"),
+    button:has(style*="background: #4F46E5"),
+    button:has(style*="background: #818CF8") {
+        color: white !important;
     }
     
     .stButton > button[kind="secondary"] {

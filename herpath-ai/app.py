@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 HERPath AI - Main Application Entry Point
 A stateful, adaptive career execution system for women in tech.
@@ -406,7 +406,7 @@ def _render_login_form():
         password = st.text_input("Password", type="password", placeholder="Enter your password")
         
         st.markdown("")
-        submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")
+        submitted = st.form_submit_button("Sign In", use_container_width=True)
         
         if submitted:
             if email and password:
@@ -438,7 +438,7 @@ def _render_signup_form():
         confirm_password = st.text_input("Confirm Password", type="password", placeholder="Re-enter password")
         
         st.markdown("")
-        submitted = st.form_submit_button("Create Account", use_container_width=True, type="primary")
+        submitted = st.form_submit_button("Create Account", use_container_width=True)
         
         if submitted:
             if not all([name, email, password, confirm_password]):

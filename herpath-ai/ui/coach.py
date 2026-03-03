@@ -113,14 +113,28 @@ def _render_chat_interface(db_client, uid: str, user_data: Dict, roadmap_data: D
         if uid and db_client:
             history = db_client.get_chat_history(uid, limit=20)
             for chat in history:
-                st.session_state.chat_messages.append({
-                    "role": "user",
-                    "content": chat.get('user_message', '')
-                })
-                st.session_state.chat_messages.append({
-                    "role": "assistant",
-                    "content": chat.get('ai_response', '')
-                })
+                # Handle paired format (user_message + ai_response in one doc)
+                if 'user_message' in chat and 'ai_response' in chat:
+                    user_msg = chat.get('user_message', '').strip()
+                    ai_msg = chat.get('ai_response', '').strip()
+                    if user_msg:  # Only add if not empty
+                        st.session_state.chat_messages.append({
+                            "role": "user",
+                            "content": user_msg
+                        })
+                    if ai_msg:  # Only add if not empty
+                        st.session_state.chat_messages.append({
+                            "role": "assistant",
+                            "content": ai_msg
+                        })
+                # Handle individual message format (fallback)
+                elif 'role' in chat and 'content' in chat:
+                    content = chat.get('content', '').strip()
+                    if content:  # Only add if not empty
+                        st.session_state.chat_messages.append({
+                            "role": chat.get('role', 'user'),
+                            "content": content
+                        })
     
     # Chat container
     chat_container = st.container()

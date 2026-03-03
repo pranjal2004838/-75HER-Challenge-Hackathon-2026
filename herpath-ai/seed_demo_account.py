@@ -196,40 +196,28 @@ def seed_demo_account():
         db.collection('progress').document(demo_uid).set(progress_data)
         print("✅ Progress tracking created")
         
-        # 4. Create sample chat history
-        messages = [
+        # 4. Create sample chat history (paired user + AI messages)
+        chat_pairs = [
             {
                 'uid': demo_uid,
-                'role': 'user',
-                'content': "I'm feeling stuck on list comprehensions. Can you help?",
+                'user_message': "I'm feeling stuck on list comprehensions. Can you help?",
+                'ai_response': "Absolutely, Sarah! List comprehensions are Python's elegant way to transform lists in one line. Think of them as a compact for-loop. Instead of writing:\n\n```python\nsquares = []\nfor x in range(10):\n    squares.append(x**2)\n```\n\nYou can write: `squares = [x**2 for x in range(10)]`\n\nThe pattern is: `[expression for item in iterable if condition]`\n\nStart simple - convert your for-loops to comprehensions one at a time. Don't worry about mastering nested comprehensions yet; even experienced devs sometimes prefer explicit loops for readability. What specific list comprehension is giving you trouble?",
+                'mode': 'feeling_stuck',
                 'timestamp': datetime.utcnow() - timedelta(days=2),
                 'page': 'coach'
             },
             {
                 'uid': demo_uid,
-                'role': 'assistant',
-                'content': "Absolutely, Sarah! List comprehensions are Python's elegant way to transform lists...",
-                'timestamp': datetime.utcnow() - timedelta(days=2, seconds=15),
-                'page': 'coach'
-            },
-            {
-                'uid': demo_uid,
-                'role': 'user',
-                'content': "How do I know if I'm ready to move from Python basics to ML?",
+                'user_message': "How do I know if I'm ready to move from Python basics to ML?",
+                'ai_response': "Great question! You're ready when you can confidently do these 3 things:\n\n**1. Data Wrangling (70% of ML work)**\n- Load CSV/JSON files without googling\n- Filter, sort, group data with pandas\n- Handle missing values and duplicates\n\n**2. Functions & Logic**\n- Write functions that take parameters and return values\n- Use if/else and loops naturally\n- Debug errors by reading stack traces\n\n**3. Basic Math Comfort**\n- Understand mean, median, variance\n- Can plot data with matplotlib\n- Not afraid of formulas (even if you need to look them up)\n\nYou're at Week 4 with 7 tasks completed - you've covered Python basics and are starting NumPy. Perfect timing! Week 5-8 will bridge you into ML. The key insight: **ML is just Python + math + data**. You already have the Python part. 🎯\n\nDon't wait to feel 'perfectly ready' - that's imposter syndrome talking. Move forward when you're 70% confident, not 100%.",
+                'mode': 'clarify_plan',
                 'timestamp': datetime.utcnow() - timedelta(days=1),
-                'page': 'coach'
-            },
-            {
-                'uid': demo_uid,
-                'role': 'assistant',
-                'content': "Great question! You're ready when you can: 1) Write functions without googling syntax...",
-                'timestamp': datetime.utcnow() - timedelta(days=1, seconds=20),
                 'page': 'coach'
             }
         ]
         
-        for msg in messages:
-            db.collection('chat_history').add(msg)
+        for chat in chat_pairs:
+            db.collection('chat_history').add(chat)
         
         print("✅ Chat history created")
         

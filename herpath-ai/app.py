@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 HERPath AI - Main Application Entry Point
 A stateful, adaptive career execution system for women in tech.

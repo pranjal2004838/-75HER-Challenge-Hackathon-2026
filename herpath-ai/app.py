@@ -114,73 +114,47 @@ st.markdown("""
         color: white !important;
     }
     
-    /* ========== BUTTONS ========== */
-    .stButton > button {
-        border-radius: 8px !important;
-        font-weight: 500 !important;
-        padding: 0.625rem 1.25rem !important;
-        transition: all 0.15s ease !important;
-        border: 1px solid var(--border) !important;
+    /* ========== BUTTONS - ULTRA AGGRESSIVE WHITE TEXT ========== */
+    
+    /* Use Streamlit's data-testid for maximum specificity */
+    div[data-testid="stButton"] button[kind="primary"],
+    div[data-testid="stFormSubmitButton"] button[kind="primary"],
+    div[data-testid="stButton"] > button,
+    button[kind="primary"] {
+        color: #FFFFFF !important;
     }
     
-    /* Primary buttons - blue background with white text */
-    .stButton > button[kind="primary"] {
+    div[data-testid="stButton"] button[kind="primary"]:hover,
+    div[data-testid="stFormSubmitButton"] button[kind="primary"]:hover,
+    button[kind="primary"]:hover {
+        color: #FFFFFF !important;
+    }
+    
+    div[data-testid="stButton"] button[kind="primary"]:focus,
+    div[data-testid="stFormSubmitButton"] button[kind="primary"]:focus,
+    div[data-testid="stButton"] button[kind="primary"]:active,
+    div[data-testid="stFormSubmitButton"] button[kind="primary"]:active,
+    button[kind="primary"]:focus,
+    button[kind="primary"]:active {
+        color: #FFFFFF !important;
+    }
+    
+    /* Primary buttons with blue background */
+    .stButton > button[kind="primary"],
+    div[data-testid="stButton"] button[kind="primary"],
+    div[data-testid="stFormSubmitButton"] button {
         background: var(--primary) !important;
         border-color: var(--primary) !important;
-        color: white !important;
     }
     
-    .stButton > button[kind="primary"]:hover {
+    .stButton > button[kind="primary"]:hover,
+    div[data-testid="stButton"] button[kind="primary"]:hover,
+    div[data-testid="stFormSubmitButton"] button:hover {
         background: var(--primary-dark) !important;
         border-color: var(--primary-dark) !important;
-        color: white !important;
     }
     
-    .stButton > button[kind="primary"]:focus {
-        color: white !important;
-        background: var(--primary) !important;
-    }
-    
-    .stButton > button[kind="primary"]:active {
-        color: white !important;
-        background: var(--primary-dark) !important;
-    }
-    
-    .stButton > button[kind="primary"]:focus-visible {
-        color: white !important;
-    }
-    
-    /* Ensure all blue background buttons have white text - multiple color variations */
-    .stButton > button[style*="background: var(--primary)"],
-    .stButton > button[style*="background-color: rgb(99, 102, 241)"],
-    .stButton > button[style*="background-color: rgb(79, 70, 229)"],
-    .stButton > button[style*="background-color: rgb(129, 140, 248)"],
-    .stButton > button[style*="#6366F1"],
-    .stButton > button[style*="#4F46E5"],
-    .stButton > button[style*="#818CF8"] {
-        color: white !important;
-    }
-    
-    /* Target any button with Streamlit's default primary blue color in any state */
-    button[style*="rgb(99, 102, 241)"],
-    button[style*="rgb(79, 70, 229)"],
-    button[style*="rgb(129, 140, 248)"],
-    button[style*="#6366F1"],
-    button[style*="#4F46E5"],
-    button[style*="#818CF8"] {
-        color: white !important;
-    }
-    
-    /* Super aggressive: any button that might have a blue background gets white text */
-    button:has(style*="background: rgb(99, 102, 241)"),
-    button:has(style*="background: rgb(79, 70, 229)"),
-    button:has(style*="background: rgb(129, 140, 248)"),
-    button:has(style*="background: #6366F1"),
-    button:has(style*="background: #4F46E5"),
-    button:has(style*="background: #818CF8") {
-        color: white !important;
-    }
-    
+    /* Secondary buttons */
     .stButton > button[kind="secondary"] {
         background: white !important;
         color: var(--text-primary) !important;

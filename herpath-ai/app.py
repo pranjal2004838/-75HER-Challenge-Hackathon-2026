@@ -123,31 +123,26 @@ st.markdown("""
         border: 1px solid var(--border) !important;
     }
     
-    /* Primary buttons - blue background with white text */
+    /* Primary buttons - blue background with white text - CRITICAL FIX */
     .stButton > button[kind="primary"] {
         background: var(--primary) !important;
         border-color: var(--primary) !important;
         color: white !important;
     }
     
-    .stButton > button[kind="primary"]:hover {
-        background: var(--primary-dark) !important;
-        border-color: var(--primary-dark) !important;
-        color: white !important;
+    /* Override Streamlit's inline styles with !important */
+    button {
+        color: inherit !important;
     }
     
-    .stButton > button[kind="primary"]:focus {
-        color: white !important;
-        background: var(--primary) !important;
-    }
-    
-    .stButton > button[kind="primary"]:active {
-        color: white !important;
-        background: var(--primary-dark) !important;
-    }
-    
+    .stButton > button[kind="primary"],
+    .stButton > button[kind="primary"]:hover,
+    .stButton > button[kind="primary"]:focus,
+    .stButton > button[kind="primary"]:active,
     .stButton > button[kind="primary"]:focus-visible {
         color: white !important;
+        background: var(--primary) !important;
+        border-color: var(--primary) !important;
     }
     
     /* Ensure all blue background buttons have white text - multiple color variations */

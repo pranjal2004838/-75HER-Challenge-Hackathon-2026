@@ -27,7 +27,7 @@ def get_gemini_api_key():
 LLM_PROVIDER = "gemini"
 
 # Model configurations
-GEMINI_MODEL = "gemini-3-flash"
+GEMINI_MODEL = "gemini-1.5-flash"
 
 # =============================================================================
 # APPLICATION SETTINGS

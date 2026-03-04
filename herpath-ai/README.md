@@ -20,6 +20,91 @@
 Sign in and see the system in action. Explore onboarding, personal roadmap generation, AI coach, and adaptive rebalancing—live.
 
 ---
+
+## 📋 Project Pitch
+
+**Headline (6-10 words):**  
+Stop women leaving tech—unlock their potential.
+
+**Subhead (14-24 words):**  
+HERPath AI transforms career uncertainty into personalized, adaptive roadmaps with emotional intelligence and accountability coaching.
+
+**Call-to-Action (1 verb):**  
+[Start your journey →](https://herpathai.streamlit.app/)
+
+---
+
+## 🎯 4-Line Problem Frame
+
+| Component | Details |
+|-----------|---------|
+| **User** | Women transitioning into tech (18-50 yrs old, career switchers, re-entry specialists) with imposter syndrome & limited mentorship |
+| **Problem** | 60% of women leave tech within 5 years due to vague career advice, overwhelming resource choices, undetected burnout, and lack of emotional support |
+| **Constraints** | Budget-friendly (free tier), no setup required, works on mobile, respects privacy (no personal data shared) |
+| **Success Test** | User completes onboarding → receives specific, phased roadmap → coach detects emotional signals → system adapts pacing when user falls behind |
+
+---
+
+## 🏗️ Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         HERPATH AI SYSTEM                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+                    ┌──────────────────────────┐
+                    │   Streamlit Frontend     │
+                    │  (Onboarding, Coach,     │
+                    │   Roadmap, Progress)     │
+                    └────────────┬─────────────┘
+                                 │ HTTP/WS
+                    ┌────────────▼─────────────┐
+                    │   Authentication Layer   │
+                    │   (Firebase Auth)        │
+                    └────────────┬─────────────┘
+                                 │
+        ┌────────────────────────┼────────────────────────┐
+        │                        │                        │
+        ▼                        ▼                        ▼
+   ┌─────────┐          ┌──────────────┐        ┌────────────────┐
+   │  Agents │          │   Database   │        │  LLM Provider  │
+   │─────────│          │──────────────│        │────────────────│
+   │• Skill  │          │ • Firestore  │        │ • Gemini 3 API │
+   │  Gap    │          │ • Realtime   │        │ • Fallback     │
+   │• Roadmap│          │   Database   │        │   Templates    │
+   │• Coach  │          │              │        │                │
+   │• Rebal- │   ◄─────►│ User Data    │◄──────►│ Multi-turn     │
+   │  ance   │          │ Roadmap      │        │ conversations  │
+   │         │          │ Progress     │        │                │
+   │ (Goose) │          │ Chat History │        │                │
+   └─────────┘          └──────────────┘        └────────────────┘
+        │                        │                        │
+        └────────────────────────┼────────────────────────┘
+                    ┌────────────▼─────────────┐
+                    │  Rule Engine + Logging   │
+                    │  (Rebalance Triggers,    │
+                    │   Error Handling,        │
+                    │   Analytics)             │
+                    └──────────────────────────┘
+```
+
+**Data Flow:**
+1. **Onboarding** → User provides (goal, level, hours, timeline, background) → stored in Firestore
+2. **Roadmap Generation** → GooseAgent (Plan-Execute-Verify) calls Gemini API → 3-phase roadmap with specific tasks
+3. **Coach Support** → Multi-turn conversation stored in Firestore → Coach detects emotions → suggests adjustments
+4. **Adaptive Rebalancing** → Rule engine monitors progress → Firestore triggers rebalance if >30% tasks missed
+5. **Session Persistence** → All data in Firestore → user can close app and resume anytime
+
+**Key Technologies:**
+- **Frontend:** Streamlit (Python-based, instant deployment)
+- **Backend:** Firebase Firestore (NoSQL, real-time, serverless)
+- **AI/ML:** Google Gemini 3 Flash API + Custom Goose agents
+- **Reliability:** Exponential backoff retry, fallback templates, comprehensive error logging
+
+---
+
+## ❌ Problem Statement
+
 - ❌ Career breaks creating re-entry anxiety
 - ❌ Overwhelm from conflicting online resources
 
@@ -418,6 +503,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 3.5 (Optional) Copy Environment Template
+```bash
+# For local development with .env file (not required for Streamlit)
+cp .env.example .env
+# Edit .env with your actual API keys
+```
+
 ### 4. Configure Secrets
 
 Create `.streamlit/secrets.toml`:
@@ -646,6 +738,8 @@ response = requests.post(
 - **[Agent Architecture](docs/AGENTS.md)** - How the multi-agent system works
 - **[Goose Framework Guide](docs/GOOSE.md)** - Our custom implementation
 - **[Deployment Guide](docs/DEPLOYMENT.md)** - Deploy to production
+- **[AI Trace Log](docs/AI_TRACE_LOG.md)** - AI decision-making and Goose integration (REQUIRED for AI/ML track)
+- **[Evidence Guide](docs/EVIDENCE_GUIDE.md)** - Step-by-step screenshot capture instructions
 - **[Contributing](CONTRIBUTING.md)** - How to contribute
 
 ---

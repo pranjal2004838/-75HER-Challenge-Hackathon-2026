@@ -53,6 +53,99 @@ Judges can verify HERPath AI works by:
 
 ---
 
+## 📸 Evidence Log / Demo Screenshots
+
+**Need help capturing these? → [See Evidence Screenshot Guide](docs/EVIDENCE_GUIDE.md)** (Step-by-step instructions to capture each test)
+
+### ✅ Test 1: Onboarding → Personalized Roadmap Generation
+
+![Onboarding to Roadmap](docs/evidence/01_onboarding_to_roadmap.png)
+
+**What to capture:**
+1. Open https://herpathai.streamlit.app/
+2. Sign out if logged in, then sign in fresh
+3. **Without** using demo account, start onboarding (OR use fresh credentials)
+4. Fill out 7-step form (goal, level, hours, timeline, financial, situation, background)
+5. System generates roadmap → capture the roadmap output showing:
+   - Phase names (Foundation, Intermediate, Advanced)
+   - Week-by-week breakdown with specific tasks
+   - Milestone and success metrics
+   - At least 2-3 LeetCode problem numbers visible
+
+**How to add the screenshot:**
+```bash
+# 1. Take screenshot of the roadmap result
+# 2. Save as: docs/evidence/01_onboarding_to_roadmap.png
+# 3. Commit:
+git add docs/evidence/01_onboarding_to_roadmap.png
+git commit -m "evidence: Add onboarding → roadmap generation screenshot"
+```
+
+---
+
+### ✅ Test 2: Emotional Intelligence - Imposter Syndrome Detection
+
+![Imposter Syndrome Detection](docs/evidence/02_coach_emotional_detection.png)
+
+**What to capture:**
+1. Go to Coach tab in sidebar
+2. In background/situation field, type text containing emotional signals:
+   - "I always felt like I didn't belong in tech"
+   - "imposter syndrome"
+   - or "I compare myself to CS graduates"
+3. Coach responds with:
+   - **Explicit detection**: "I notice you mentioned [feeling]..."
+   - **Adaptive pacing**: "Let me adjust your pace with a Quick Win Week"
+   - **Affirmations**: "You belong here. This feeling is normal"
+4. Capture the coach response showing emotional awareness
+
+**How to add the screenshot:**
+```bash
+# 1. Take screenshot of coach's emotional response
+# 2. Save as: docs/evidence/02_coach_emotional_detection.png
+# 3. Commit:
+git add docs/evidence/02_coach_emotional_detection.png
+git commit -m "evidence: Add coach emotional intelligence detection screenshot"
+```
+
+---
+
+### ✅ Test 3: Adaptive Rebalancing Engine Trigger
+
+![Rebalance Rule Trigger](docs/evidence/03_rebalance_trigger.png)
+
+**What to capture:**
+1. Use demo account: `judge@herpath-demo.ai` / `HERPathDemo2026`
+2. Go to Progress tab
+3. Mark 15+ tasks as "Missed" (click task → mark incomplete)
+4. System should detect >30% miss rate and trigger rebalance suggestion
+5. Capture the rebalance alert showing:
+   - "You've missed X% of tasks"
+   - Recommendation: "Let's adjust your roadmap"
+   - Suggested actions (extend timeline, focus on priorities, etc.)
+   - Before/After comparison (original weeks vs. new timeline)
+
+**How to add the screenshot:**
+```bash
+# 1. Take screenshot of rebalance recommendation
+# 2. Save as: docs/evidence/03_rebalance_trigger.png
+# 3. Commit:
+git add docs/evidence/03_rebalance_trigger.png
+git commit -m "evidence: Add adaptive rebalance rule trigger screenshot"
+```
+
+---
+
+## 🎬 Quick Evidence Summary
+
+| Feature | Screenshot | Evidence |
+|---------|-----------|----------|
+| **Personalized Roadmap** | `01_onboarding_to_roadmap.png` | Role-specific tasks + LeetCode #s |
+| **Emotional Intelligence** | `02_coach_emotional_detection.png` | Detects imposter syndrome + adjusts pacing |
+| **Adaptive Rebalancing** | `03_rebalance_trigger.png` | >30% miss rate detected + timeline extended |
+
+---
+
 ## 🏗️ Architecture Decisions (Why These Choices?)
 
 ### 1. **Custom Goose Implementation vs. Official goose-ai Package**

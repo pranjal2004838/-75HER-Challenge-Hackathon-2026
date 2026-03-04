@@ -137,7 +137,7 @@ def _render_profile_settings(db_client, uid: str, user_data: Dict):
                     
                     st.rerun()
                 else:
-                    st.error("Failed to update profile. Please try again.")
+                    st.error("😕 Failed to update profile. Please try again.")
 
 
 def _render_rebalance_section(db_client, uid: str, user_data: Dict, roadmap_data: Dict, progress_data: Dict):
@@ -552,7 +552,7 @@ def _execute_rebalance(
             
             st.rerun()
         else:
-            st.error("Failed to save rebalanced roadmap. Please try again.")
+            st.error("😕 Failed to save rebalanced roadmap. Please try again.")
 
 
 def _render_account_settings(uid: str):
@@ -582,4 +582,4 @@ def _render_account_settings(uid: str):
         st.warning("These actions cannot be undone!")
         
         if st.button("🗑️ Delete All My Data", type="secondary"):
-            st.error("This feature is disabled for safety. Contact support to delete your account.")
+            st.error("🔒 This feature is disabled for safety. Contact support to delete your account.")

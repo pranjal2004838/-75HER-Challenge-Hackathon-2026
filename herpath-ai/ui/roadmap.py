@@ -133,7 +133,7 @@ def _render_phase(phase: Dict, current_week: int, db_client, uid: str):
 
 
 def _render_week(week: Dict, current_week: int, db_client, uid: str):
-    """Render a single week."""
+    """Render a single week with enhanced badges and styling."""
     
     week_number = week.get('week_number', 0)
     focus_skill = week.get('focus_skill', 'General')
@@ -145,59 +145,86 @@ def _render_week(week: Dict, current_week: int, db_client, uid: str):
     if week_number < current_week:
         status = "completed"
         status_badge = "✅"
+        status_color = "#10b981"
+        bg_color = "#f0fdf4"
     elif week_number == current_week:
         status = "current"
-        status_badge = "▶️"
+        status_badge = "💯"
+        status_color = "#7c3aed"
+        bg_color = "#f5f3ff"
     else:
         status = "upcoming"
-        status_badge = "⏳"
+        status_badge = "📅"
+        status_color = "#94a3b8"
+        bg_color = "#f8fafc"
     
-    # Week container
-    with st.container():
-        # Header
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.markdown(f"### {status_badge} Week {week_number}: {focus_skill}")
-        with col2:
-            if status == "current":
-                st.markdown("**CURRENT**")
+    # Week container with enhanced styling
+    st.markdown(f"""
+    <div style="background: {bg_color}; padding: 1rem; border-radius: 8px; margin: 0.75rem 0;
+                border-left: 4px solid {status_color}; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h4 style="margin: 0; color: #1e293b;">
+                    {status_badge} Week {week_number}: {focus_skill}
+                </h4>
+            </div>
+            <div style="text-align: right;">
+                <span style="display: inline-block; background: {status_color}; color: white; 
+                           padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+                    {status.replace('_', ' ').upper()}
+                </span>
+                    {"<span style='color: #7c3aed; font-weight: 700; margin-left: 0.5rem; font-size: 1.2rem;'>← You are here</span>" if week_number == current_week else ""}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Tasks
+    st.markdown("**Tasks:**")
+    
+    if status == "current":
+        # Interactive tasks for current week
+        db_tasks = db_client.get_tasks_for_week(uid, week_number) if db_client else None
         
-        # Tasks
-        st.markdown("**Tasks:**")
-        
-        if status == "current":
-            # Interactive tasks for current week
-            db_tasks = db_client.get_tasks_for_week(uid, week_number) if db_client else None
-            
-            if db_tasks:
-                for task in db_tasks:
-                    task_id = task.get('doc_id')
-                    task_status = task.get('status', 'pending')
-                    title = task.get('title', '')
-                    
-                    checked = st.checkbox(
-                        title,
-                        value=(task_status == 'completed'),
-                        key=f"roadmap_task_{task_id}"
-                    )
-                    
-                    # Update if changed
-                    new_status = 'completed' if checked else 'pending'
-                    if new_status != task_status:
-                        if db_client:
-                            db_client.update_task_status(task_id, new_status)
-                            db_client.update_progress(uid)
-                        st.rerun()
-            else:
-                for task in tasks:
-                    st.markdown(f"- {task}")
+        if db_tasks:
+            for task in db_tasks:
+                task_id = task.get('doc_id')
+                task_status = task.get('status', 'pending')
+                title = task.get('title', '')
+                
+                checked = st.checkbox(
+                    title,
+                    value=(task_status == 'completed'),
+                    key=f"roadmap_task_{task_id}"
+                )
+                
+                # Update if changed
+                new_status = 'completed' if checked else 'pending'
+                if new_status != task_status:
+                    if db_client:
+                        db_client.update_task_status(task_id, new_status)
+                        db_client.update_progress(uid)
+                    st.rerun()
         else:
-            # Static list for other weeks
             for task in tasks:
-                if status == "completed":
-                    st.markdown(f"- ~~{task}~~")
-                else:
-                    st.markdown(f"- {task}")
+                st.markdown(f"- {task}")
+    else:
+        # Static list for other weeks
+        for task in tasks:
+            if status == "completed":
+                st.markdown(f"- ~~{task}~~")
+            else:
+                st.markdown(f"- {task}")
+    
+    # Milestone and success metric
+    if milestone or success_metric:
+        col1, col2 = st.columns(2)
+        if milestone:
+            with col1:
+                st.caption(f"🎯 **Milestone:** {milestone}")
+        if success_metric:
+            with col2:
+                st.caption(f"✅ **Success Metric:** {success_metric}")
         
         # Milestone
         if milestone:

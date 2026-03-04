@@ -93,14 +93,22 @@ def _render_mode_selector():
     
     for i, (mode_key, (label, desc)) in enumerate(modes.items()):
         with cols[i]:
+            is_selected = st.session_state.coach_mode == mode_key
+            button_style = "primary" if is_selected else "secondary"
+            
+            # Render mode button with description
             if st.button(
                 label,
                 use_container_width=True,
-                type="primary" if st.session_state.coach_mode == mode_key else "secondary",
-                help=desc
+                type=button_style,
+                key=f"mode_{mode_key}"
             ):
                 st.session_state.coach_mode = mode_key
                 st.rerun()
+            
+            # Show description under selected mode
+            if is_selected:
+                st.caption(f"✨ {desc}", unsafe_allow_html=True)
 
 
 def _render_chat_interface(db_client, uid: str, user_data: Dict, roadmap_data: Dict, progress_data: Dict):
@@ -109,9 +117,10 @@ def _render_chat_interface(db_client, uid: str, user_data: Dict, roadmap_data: D
     # Initialize chat history in session state
     if 'chat_messages' not in st.session_state:
         st.session_state.chat_messages = []
-        # Load from database
+        # Load from database with loading spinner
         if uid and db_client:
-            history = db_client.get_chat_history(uid, limit=20)
+            with st.spinner("📚 Loading your conversations..."):
+                history = db_client.get_chat_history(uid, limit=20)
             for chat in history:
                 # Handle paired format (user_message + ai_response in one doc)
                 if 'user_message' in chat and 'ai_response' in chat:
@@ -136,21 +145,54 @@ def _render_chat_interface(db_client, uid: str, user_data: Dict, roadmap_data: D
                             "content": content
                         })
     
+    # Empty state - Show friendly intro when no messages
+    if not st.session_state.chat_messages:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%); 
+                    padding: 2rem; border-radius: 12px; text-align: center;">
+            <p style="font-size: 2rem; margin: 0;">👋 Hey there!</p>
+            <p style="color: #64748B; font-size: 1.1rem; margin-top: 0.5rem;">
+                I'm your AI Coach. Let's explore your learning journey together.
+            </p>
+            <p style="color: #7C3AED; font-weight: 600; margin-top: 1rem; font-size: 0.9rem;">
+                Try asking me:
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Quick prompt suggestions
+        cols = st.columns(2)
+        suggestions = render_quick_prompts(st.session_state.get('coach_mode', 'general'))
+        for i, suggestion in enumerate(suggestions[:4]):
+            with cols[i % 2]:
+                if st.button(f"💬 {suggestion}", use_container_width=True, key=f"suggest_{i}"):
+                    st.session_state.suggested_message = suggestion
+                    st.rerun()
+    
     # Chat container
     chat_container = st.container()
     
     with chat_container:
-        # Display chat history
-        for message in st.session_state.chat_messages:
+        # Display chat history with enhanced styling
+        for idx, message in enumerate(st.session_state.chat_messages):
             role = message.get("role", "user")
             content = message.get("content", "")
+            timestamp = message.get("timestamp", "")
             
             if role == "user":
                 with st.chat_message("user"):
-                    st.markdown(content)
+                    st.markdown(f"""<div style="background: #f0f4f8; padding: 1rem; border-radius: 8px; margin: 0.5rem 0;">
+                    {content}
+                    </div>""", unsafe_allow_html=True)
+                    if timestamp:
+                        st.caption(f"📅 {timestamp}")
             else:
                 with st.chat_message("assistant", avatar="🤖"):
-                    st.markdown(content)
+                    st.markdown(f"""<div style="background: #f9f9f9; padding: 1rem; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #7C3AED;">
+                    {content}
+                    </div>""", unsafe_allow_html=True)
+                    if timestamp:
+                        st.caption(f"📅 {timestamp}")
     
     # Chat input
     mode = st.session_state.get('coach_mode', 'general')
@@ -162,13 +204,19 @@ def _render_chat_interface(db_client, uid: str, user_data: Dict, roadmap_data: D
         "general": "Type your message..."
     }
     
-    user_input = st.chat_input(mode_placeholders.get(mode, "Type your message..."))
+    # Handle suggested message if user clicked a suggestion
+    if 'suggested_message' in st.session_state:
+        user_input = st.session_state.pop('suggested_message')
+    else:
+        user_input = st.chat_input(mode_placeholders.get(mode, "Type your message..."))
     
     if user_input:
-        # Add user message to history
+        # Add user message to history with timestamp
+        from datetime import datetime
         st.session_state.chat_messages.append({
             "role": "user",
-            "content": user_input
+            "content": user_input,
+            "timestamp": datetime.now().strftime("%I:%M %p")
         })
         
         # Display user message immediately
@@ -187,10 +235,12 @@ def _render_chat_interface(db_client, uid: str, user_data: Dict, roadmap_data: D
                 st.session_state.chat_messages
             )
         
-        # Add assistant response to history
+        # Add assistant response to history with timestamp
+        from datetime import datetime
         st.session_state.chat_messages.append({
             "role": "assistant",
-            "content": response
+            "content": response,
+            "timestamp": datetime.now().strftime("%I:%M %p")
         })
         
         # Display assistant response
@@ -268,7 +318,7 @@ def _get_coach_response(
             return get_fallback_response(mode, message)
             
     except Exception as e:
-        st.error(f"Error getting response: {e}")
+        st.error(f"😕 Couldn't get AI response: {str(e)[:50]}")
         return get_fallback_response(mode, message)
 
 

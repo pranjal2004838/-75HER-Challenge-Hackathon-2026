@@ -168,26 +168,48 @@ def render_dashboard(db_client, user_data: Dict, roadmap_data: Dict, progress_da
         # =====================================================================
         # PREMIUM HEADER WITH ADAPTIVE BADGE
         # =====================================================================
-        col1, col2 = st.columns([3, 1])
+        st.markdown(f"""
+        <div style="margin-bottom: 1rem;">
+            <span style="font-size: 2.5rem; font-weight: 700; color: #1E293B;">
+                {emoji} {greeting}
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
         
-        with col1:
+        # PROMINENT DAILY AFFIRMATION CARD - KEY DIFFERENTIATOR
+        import hashlib
+        from datetime import date
+        
+        # Create a hash combining UID and today's date to get fresh affirmation daily
+        today_key = f"{user_data.get('uid', '')}-{str(date.today())}"
+        affirmation_index = int(hashlib.md5(today_key.encode()).hexdigest(), 16) % len(AFFIRMATIONS)
+        affirmation = AFFIRMATIONS[affirmation_index]
+        
+        col_aff, col_adaptive = st.columns([2.5, 1])
+        
+        with col_aff:
             st.markdown(f"""
-            <div style="margin-bottom: 0.5rem;">
-                <span style="font-size: 2.5rem; font-weight: 700; color: #1E293B;">
-                    {emoji} {greeting}
-                </span>
+            <div style="background: linear-gradient(135deg, #F3E8FF 0%, #EDE9FE 100%); 
+                        padding: 1.5rem 2rem; border-radius: 12px; 
+                        border-left: 5px solid #7C3AED;
+                        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 2rem;">💜</span>
+                    <div>
+                        <p style="margin: 0; color: #7C3AED; font-size: 0.75rem; font-weight: 600; 
+                                  text-transform: uppercase; letter-spacing: 1px;">
+                            Daily Affirmation
+                        </p>
+                        <p style="margin: 0.5rem 0 0 0; color: #1E293B; font-size: 1.3rem; 
+                                  font-weight: 600; line-height: 1.4;">
+                            "{affirmation}"
+                        </p>
+                    </div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
-            
-            # Daily affirmation - changes daily
-            affirmation = AFFIRMATIONS[hash(str(user_data.get('uid', ''))) % len(AFFIRMATIONS)]
-            st.markdown(f"""
-            <p style="color: #7C3AED; font-style: italic; font-size: 1.1rem; margin-top: 0;">
-                "{affirmation}"
-            </p>
-            """, unsafe_allow_html=True)
         
-        with col2:
+        with col_adaptive:
             # ADAPTIVE INDICATOR - Very visible differentiator
             st.markdown("""
             <div style="text-align: right;">

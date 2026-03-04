@@ -64,12 +64,24 @@ def render_progress(db_client, user_data: Dict, roadmap_data: Dict, progress_dat
 
 
 def _render_progress_metrics(progress_data: Dict, roadmap_data: Dict):
-    """Render main progress metrics."""
+    """Render main progress metrics with motivational messaging."""
+    
+    completion = progress_data.get('completion_percentage', 0)
+    
+    # Show motivational banner based on completion
+    if completion < 20:
+        st.info("🌱 **You're just getting started!** Every step counts. Keep going!")
+    elif completion >= 50 and completion < 75:
+        st.success("💯 **Halfway there! You're crushing it!**")
+    elif completion >= 75 and completion < 100:
+        st.success("🚀 **Final stretch! The finish line is in sight!**")
+    elif completion >= 100:
+        st.balloons()
+        st.success("🎉 **GOAL ACHIEVED! You did it! Celebrate yourself!**")
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        completion = progress_data.get('completion_percentage', 0)
         st.metric(
             "Overall Completion",
             f"{completion:.1f}%",

@@ -402,6 +402,22 @@ python seed_demo_account.py
 
 ---
 
+## 🎬 Live Demo (No Setup Required)
+
+The app is hosted and publicly accessible — no Firebase or local setup needed. Open the live demo and sign in with the demo account above:
+
+- **Live URL:** https://herpathai.streamlit.app/
+- **Demo credentials:** `judge@herpath-demo.ai` / `HERPathDemo2026`
+
+Quick access for judges (opens the app immediately):
+```bash
+# Open the live demo in your browser
+start https://herpathai.streamlit.app/
+```
+
+Use the demo account to verify the Success Tests listed above (onboarding → roadmap generation, coach responses, and rebalance behavior).
+
+
 ## 🧪 Testing & Quality
 
 ### Run Tests

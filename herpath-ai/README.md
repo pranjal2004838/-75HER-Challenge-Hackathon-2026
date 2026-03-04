@@ -13,11 +13,13 @@
 
 ---
 
-## 🎯 Problem Statement
+## 🎬 [**→ OPEN LIVE DEMO (No Setup Needed)**](https://herpathai.streamlit.app/)
 
-**60% of women leave tech within 10 years.** Why?
-- ❌ Vague "learn to code" advice without clear paths
-- ❌ Imposter syndrome from comparing to others' journeys
+**Demo Account:** `judge@herpath-demo.ai` / `HERPathDemo2026`
+
+Sign in and see the system in action. Explore onboarding, personal roadmap generation, AI coach, and adaptive rebalancing—live.
+
+---
 - ❌ Career breaks creating re-entry anxiety
 - ❌ Overwhelm from conflicting online resources
 

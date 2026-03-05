@@ -66,6 +66,10 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+test_coach_direct.py
+test_coach_focused.py
+test_final_coach.py
+test_models.py
 
 # Temporary files
 *.tmp

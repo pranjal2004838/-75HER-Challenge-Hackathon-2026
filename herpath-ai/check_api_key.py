@@ -38,13 +38,11 @@ with col2:
             st.success(f"✓ Loaded")
             st.code(f"{key[:12]}...{key[-8:]}")
             
-            # Check if it's the NEW key
-            if key == "AIzaSyC_NiP0jrW9tDtL3AU4XwiO3JnphqTMYmc":
-                st.success("✅ **NEW KEY (Correct)**")
-            elif key == "AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8":
-                st.error("❌ **OLD KEY (Blacklisted)**")
+            # Validate key format (never hardcode actual keys!)
+            if key.startswith("AIzaSy") and len(key) > 30:
+                st.success("✅ **Key format valid**")
             else:
-                st.warning("⚠️ Unknown key")
+                st.warning("⚠️ Key format looks unusual")
         else:
             st.error("✗ No key loaded")
     except Exception as e:

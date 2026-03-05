@@ -41,13 +41,11 @@ try:
     if loaded_key:
         print(f"  ✓ Agent loaded key: {loaded_key[:12]}...{loaded_key[-6:]}")
         
-        # Check if it's the NEW key
-        if loaded_key == "AIzaSyC_NiP0jrW9tDtL3AU4XwiO3JnphqTMYmc":
-            print("  ✓ KEY IS CORRECT - New key is loaded!")
-        elif loaded_key == "AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8":
-            print("  ✗ KEY IS OLD (BLACKLISTED) - Still loading compromised key!")
+        # Validate key format (never hardcode actual keys in code!)
+        if loaded_key.startswith("AIzaSy") and len(loaded_key) > 30:
+            print("  ✓ KEY FORMAT VALID")
         else:
-            print("  ? KEY IS UNKNOWN - Neither old nor new key")
+            print("  ? KEY FORMAT UNUSUAL")
     else:
         print("  ✗ Agent returned empty/None key")
 except Exception as e:

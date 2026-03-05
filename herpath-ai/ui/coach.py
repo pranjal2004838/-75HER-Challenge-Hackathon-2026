@@ -318,7 +318,11 @@ def _get_coach_response(
             return get_fallback_response(mode, message)
             
     except Exception as e:
-        st.error(f"😕 Couldn't get AI response: {str(e)[:50]}")
+        error_msg = str(e)
+        if "blacklisted" in error_msg.lower() or "leaked" in error_msg.lower():
+            st.error("🚨 API key needs to be updated. Please contact the admin.")
+        else:
+            st.error(f"😕 Couldn't get AI response: {error_msg[:80]}")
         return get_fallback_response(mode, message)
 
 

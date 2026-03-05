@@ -92,7 +92,7 @@ python test_before_demo.py
   OK: All agent modules imported successfully
 
 [TEST 2] Checking Gemini API key configuration...
-  OK: Gemini API key loaded (AIzaSyAgCH...)
+  OK: Gemini API key loaded (key hidden)
 
 [TEST 3] Testing Gemini API connectivity...
   OK: Gemini API is responsive (response: 'OK')
@@ -173,7 +173,7 @@ python test_before_demo.py
 **Raw Test Output:**
 ```
 [TEST 1] Checking Python imports... OK
-[TEST 2] Checking Gemini API key configuration... OK (AIzaSyAgCH...)
+[TEST 2] Checking Gemini API key configuration... OK
 [TEST 3] Testing Gemini API connectivity... OK (response: 'OK')
 [TEST 4] Testing Firebase connectivity... OK
 [TEST 5] Testing agent execution (Skill Gap Agent)... OK
@@ -211,8 +211,8 @@ def get_gemini_api_key() -> str:
     if key and len(key) > 20:
         return key
     
-    # Fallback to hardcoded key
-    return "AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8"
+    # No hardcoded fallback - key must come from config
+    return ""
 ```
 
 ### **Retry Logic**

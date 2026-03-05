@@ -258,6 +258,26 @@ class BaseAgent(ABC):
             json=payload,
             timeout=30
         )
+        
+        # Check for API key blacklist specifically
+        if response.status_code == 403:
+            try:
+                error_data = response.json()
+                error_msg = error_data.get("error", {}).get("message", "")
+                if "leaked" in error_msg.lower():
+                    logger.critical(
+                        "API KEY BLACKLISTED: Google detected this key as leaked. "
+                        "Generate a new key at https://aistudio.google.com/apikey"
+                    )
+                    raise ValueError(
+                        "API key is blacklisted (leaked). Generate a new key at "
+                        "https://aistudio.google.com/apikey and update .streamlit/secrets.toml"
+                    )
+            except (ValueError) as ve:
+                raise ve
+            except Exception:
+                pass
+        
         response.raise_for_status()
         response_data = response.json()
         

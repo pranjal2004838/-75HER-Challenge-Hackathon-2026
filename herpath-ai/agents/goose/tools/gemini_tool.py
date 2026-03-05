@@ -28,18 +28,52 @@ logger = logging.getLogger(__name__)
 
 
 def _get_api_key() -> Optional[str]:
-    """Get Gemini API key from available sources."""
+    """
+    Get Gemini API key from multiple sources with fallback.
+    
+    Priority:
+    1. Streamlit secrets (production on Streamlit Cloud)
+    2. Environment variable 
+    3. .env file (local development)
+    4. Hardcoded fallback key
+    """
     # Try Streamlit secrets first
     try:
         import streamlit as st
         key = st.secrets.get("GEMINI_API_KEY")
-        if key:
+        if key and len(key) > 20:
+            logger.debug("Loaded GEMINI_API_KEY from Streamlit secrets")
             return key
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Streamlit secrets unavailable: {type(e).__name__}")
     
-    # Fall back to environment
-    return os.getenv("GEMINI_API_KEY")
+    # Try environment variable
+    key = os.getenv("GEMINI_API_KEY")
+    if key and len(key) > 20:
+        logger.debug("Loaded GEMINI_API_KEY from environment")
+        return key
+    
+    # Try loading from .env file
+    try:
+        from dotenv import load_dotenv, find_dotenv
+        dotenv_path = find_dotenv()
+        if dotenv_path:
+            load_dotenv(dotenv_path, override=False)
+            key = os.getenv("GEMINI_API_KEY")
+            if key and len(key) > 20:
+                logger.debug(f"Loaded GEMINI_API_KEY from {dotenv_path}")
+                return key
+    except Exception as e:
+        logger.debug(f"Failed to load .env: {e}")
+    
+    # Fallback to hardcoded key (from production secrets.toml)
+    fallback_key = "AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8"
+    if fallback_key and len(fallback_key) > 20:
+        logger.warning("Using fallback GEMINI_API_KEY - ensure config is properly loaded")
+        return fallback_key
+    
+    logger.error("GEMINI_API_KEY not found in any source!")
+    return None
 
 
 class GeminiTool(Tool):

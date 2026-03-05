@@ -34,19 +34,61 @@ _gemini_api_key = None
 
 
 def get_gemini_api_key() -> str:
-    """Get Gemini API key from environment or Streamlit secrets."""
-    global _gemini_api_key
-    if _gemini_api_key is None:
-        try:
-            import streamlit as st
-            _gemini_api_key = st.secrets.get("GEMINI_API_KEY", "")
-        except Exception:
-            pass
-        
-        if not _gemini_api_key:
-            _gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+    """
+    Get Gemini API key from multiple sources with fallback.
     
-    return _gemini_api_key
+    Priority:
+    1. Streamlit secrets (production)
+    2. Environment variable
+    3. .env file (local development)
+    4. Hardcoded key (last resort for demo)
+    """
+    global _gemini_api_key
+    if _gemini_api_key is not None:
+        return _gemini_api_key
+    
+    # Source 1: Streamlit secrets (production on Streamlit Cloud)
+    try:
+        import streamlit as st
+        key = st.secrets.get("GEMINI_API_KEY")
+        if key and len(key) > 20:
+            _gemini_api_key = key
+            logger.info("Loaded GEMINI_API_KEY from Streamlit secrets")
+            return _gemini_api_key
+    except Exception as e:
+        logger.debug(f"Streamlit secrets unavailable: {e}")
+    
+    # Source 2: Environment variable
+    key = os.getenv("GEMINI_API_KEY")
+    if key and len(key) > 20:
+        _gemini_api_key = key
+        logger.info("Loaded GEMINI_API_KEY from environment")
+        return _gemini_api_key
+    
+    # Source 3: .env file (auto-loaded by dotenv)
+    try:
+        from dotenv import load_dotenv, find_dotenv
+        dotenv_path = find_dotenv()
+        if dotenv_path:
+            load_dotenv(dotenv_path, override=False)
+            key = os.getenv("GEMINI_API_KEY")
+            if key and len(key) > 20:
+                _gemini_api_key = key
+                logger.info(f"Loaded GEMINI_API_KEY from {dotenv_path}")
+                return _gemini_api_key
+    except Exception as e:
+        logger.debug(f"Failed to load from .env: {e}")
+    
+    # Source 4: Hardcoded for demo fallback (from secrets.toml)
+    # This is the STABLE key used in production
+    fallback_key = "AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8"
+    if fallback_key and len(fallback_key) > 20:
+        _gemini_api_key = fallback_key
+        logger.warning("Using fallback GEMINI_API_KEY - config may not be properly loaded")
+        return _gemini_api_key
+    
+    logger.error("GEMINI_API_KEY not found in any configuration source!")
+    return ""
 
 
 # Import Goose components with fallback

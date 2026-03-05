@@ -140,96 +140,84 @@ Judges can verify HERPath AI works by:
 
 ---
 
-## 📸 Evidence Log / Demo Screenshots
+## 📸 Demo Screenshots & Video
 
-**Need help capturing these? → [See Evidence Screenshot Guide](docs/EVIDENCE_GUIDE.md)** (Step-by-step instructions to capture each test)
+> All screenshots captured via automated Playwright walkthrough of the live app on a fresh account.
 
-### ✅ Test 1: Onboarding → Personalized Roadmap Generation
+### 🎬 Demo Video
 
-![Onboarding to Roadmap](docs/evidence/01_onboarding_to_roadmap.png)
+Full 6-minute video walkthrough from account creation through AI coaching:
 
-**What to capture:**
-1. Open https://herpathai.streamlit.app/
-2. Sign out if logged in, then sign in fresh
-3. **Without** using demo account, start onboarding (OR use fresh credentials)
-4. Fill out 7-step form (goal, level, hours, timeline, financial, situation, background)
-5. System generates roadmap → capture the roadmap output showing:
-   - Phase names (Foundation, Intermediate, Advanced)
-   - Week-by-week breakdown with specific tasks
-   - Milestone and success metrics
-   - At least 2-3 LeetCode problem numbers visible
-
-**How to add the screenshot:**
-```bash
-# 1. Take screenshot of the roadmap result
-# 2. Save as: docs/evidence/01_onboarding_to_roadmap.png
-# 3. Commit:
-git add docs/evidence/01_onboarding_to_roadmap.png
-git commit -m "evidence: Add onboarding → roadmap generation screenshot"
-```
+📹 [**Watch Demo Video**](scripts/demo_video.webm) (30 MB, WebM)
 
 ---
 
-### ✅ Test 2: Emotional Intelligence - Imposter Syndrome Detection
+### Account Creation & Onboarding
 
-![Imposter Syndrome Detection](docs/evidence/02_coach_emotional_detection.png)
-
-**What to capture:**
-1. Go to Coach tab in sidebar
-2. In background/situation field, type text containing emotional signals:
-   - "I always felt like I didn't belong in tech"
-   - "imposter syndrome"
-   - or "I compare myself to CS graduates"
-3. Coach responds with:
-   - **Explicit detection**: "I notice you mentioned [feeling]..."
-   - **Adaptive pacing**: "Let me adjust your pace with a Quick Win Week"
-   - **Affirmations**: "You belong here. This feeling is normal"
-4. Capture the coach response showing emotional awareness
-
-**How to add the screenshot:**
-```bash
-# 1. Take screenshot of coach's emotional response
-# 2. Save as: docs/evidence/02_coach_emotional_detection.png
-# 3. Commit:
-git add docs/evidence/02_coach_emotional_detection.png
-git commit -m "evidence: Add coach emotional intelligence detection screenshot"
-```
+| Step | Screenshot |
+|------|-----------|
+| Landing Page | ![Landing](scripts/screenshots/01_landing_page.png) |
+| Create Account | ![Signup](scripts/screenshots/03_signup_form_filled.png) |
+| Step 1 — Career Goal | ![Goal](scripts/screenshots/05_step1_goal.png) |
+| Step 2 — Skill Level | ![Level](scripts/screenshots/06_step2_level.png) |
+| Step 3 — Weekly Hours | ![Hours](scripts/screenshots/07_step3_hours.png) |
+| Step 4 — Timeline | ![Timeline](scripts/screenshots/08_step4_timeline.png) |
+| Step 5 — Budget | ![Budget](scripts/screenshots/09_step5_financial.png) |
+| Step 6 — Situation | ![Situation](scripts/screenshots/10_step6_situation.png) |
+| Profile Summary | ![Summary](scripts/screenshots/11_step7_profile_summary.png) |
+| AI-Generated Roadmap | ![Roadmap Generated](scripts/screenshots/12_roadmap_generated.png) |
 
 ---
 
-### ✅ Test 3: Adaptive Rebalancing Engine Trigger
+### ✅ Test 1: Personalized Roadmap Generation
 
-![Rebalance Rule Trigger](docs/evidence/03_rebalance_trigger.png)
+![Roadmap Overview](scripts/screenshots/17_roadmap_overview.png)
 
-**What to capture:**
-1. Use demo account: `judge@herpath-demo.ai` / `HERPathDemo2026`
-2. Go to Progress tab
-3. Mark 15+ tasks as "Missed" (click task → mark incomplete)
-4. System should detect >30% miss rate and trigger rebalance suggestion
-5. Capture the rebalance alert showing:
-   - "You've missed X% of tasks"
-   - Recommendation: "Let's adjust your roadmap"
-   - Suggested actions (extend timeline, focus on priorities, etc.)
-   - Before/After comparison (original weeks vs. new timeline)
+After 7-step onboarding, Gemini generates a multi-phase roadmap with role-specific tasks, week-by-week breakdown, milestones, and success metrics — all personalized to the user's goal, skill level, and constraints.
 
-**How to add the screenshot:**
-```bash
-# 1. Take screenshot of rebalance recommendation
-# 2. Save as: docs/evidence/03_rebalance_trigger.png
-# 3. Commit:
-git add docs/evidence/03_rebalance_trigger.png
-git commit -m "evidence: Add adaptive rebalance rule trigger screenshot"
-```
+---
+
+### ✅ Test 2: AI Coach — Emotional Intelligence in Action
+
+| | |
+|---|---|
+| ![Coach Welcome](scripts/screenshots/27_coach_welcome.png) | ![Coach Message](scripts/screenshots/29_coach_msg1_typed.png) |
+| ![Coach Response 1](scripts/screenshots/30_coach_response1.png) | ![Coach Response 2](scripts/screenshots/30_coach_response2.png) |
+
+**What happened:** A student typed "I feel SO behind — I don't even know SQL yet and my friends are getting placed at Google." The AI Coach responded with empathy, acknowledged imposter syndrome, and gave specific actionable steps tied to her roadmap.
+
+---
+
+### ✅ Test 3: Adaptive Rebalancing — Life Events
+
+![Life Events Grid](scripts/screenshots/32_life_events_grid.png)
+
+![Rebalanced Roadmap](scripts/screenshots/35_roadmap_after_rebalance.png)
+
+**What happened:** Selected "Feeling Overwhelmed" life event → System previewed impact (reduced weekly hours, extended timeline) → Applied rebalance → Roadmap automatically restructured.
+
+---
+
+### Dashboard, Progress & Resources
+
+| Feature | Screenshot |
+|---------|-----------|
+| Dashboard | ![Dashboard](scripts/screenshots/13_dashboard_top.png) |
+| Progress Analytics | ![Progress](scripts/screenshots/21_progress_metrics.png) |
+| Curated Resources | ![Resources](scripts/screenshots/24_resources_overview.png) |
+| Settings & Life Events | ![Settings](scripts/screenshots/31_settings_top.png) |
 
 ---
 
 ## 🎬 Quick Evidence Summary
 
-| Feature | Screenshot | Evidence |
-|---------|-----------|----------|
-| **Personalized Roadmap** | `01_onboarding_to_roadmap.png` | Role-specific tasks + LeetCode #s |
-| **Emotional Intelligence** | `02_coach_emotional_detection.png` | Detects imposter syndrome + adjusts pacing |
-| **Adaptive Rebalancing** | `03_rebalance_trigger.png` | >30% miss rate detected + timeline extended |
+| Feature | Evidence | Status |
+|---------|----------|--------|
+| **Personalized Roadmap** | Role-specific tasks, week-by-week breakdown | ✅ Verified |
+| **Emotional Intelligence** | Detects imposter syndrome + gives actionable coaching | ✅ Verified |
+| **Adaptive Rebalancing** | Life events trigger roadmap restructure | ✅ Verified |
+| **Multi-Mode Coach** | Stuck, Clarify Plan, Interview Prep, General | ✅ Verified |
+| **Curated Resources** | Role-specific free + paid resources catalog | ✅ Verified |
 
 ---
 

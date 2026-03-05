@@ -75,3 +75,6 @@ test_models.py
 *.tmp
 *.temp
 .cache/
+
+test_streamlit_simulation.py
+test_toml.py

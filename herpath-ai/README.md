@@ -148,7 +148,16 @@ Judges can verify HERPath AI works by:
 
 Full 6-minute video walkthrough from account creation through AI coaching:
 
-📹 [**Watch Demo Video**](scripts/demo_video.webm) (30 MB, WebM)
+📹 [**Watch Demo Video**](scripts/demo_video.mp4) (3.83 MB, MP4 — highly compressed)
+
+**Video includes:**
+- Account creation & 7-step onboarding wizard
+- AI-generated personalized roadmap
+- Dashboard with mood check-in
+- Roadmap details & progress analytics
+- Curated resources catalog
+- AI Coach interactions (real Gemini responses)
+- Adaptive life-event rebalancing demo
 
 ---
 

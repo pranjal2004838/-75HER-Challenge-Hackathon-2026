@@ -948,8 +948,7 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## 📧 Contact
 
-**Team**: Pranjal Gupta  
-**Email**: support@herpath.ai  
+**Team**: Pranjal jha   
 **GitHub**: [@pranjal2004838](https://github.com/pranjal2004838)  
 **Hackathon**: #75HER Challenge 2026
 

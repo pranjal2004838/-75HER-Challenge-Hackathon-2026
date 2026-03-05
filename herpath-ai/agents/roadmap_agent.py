@@ -211,7 +211,7 @@ CRITICAL GUIDELINES:
         Returns:
             Roadmap JSON or None
         """
-        return self.execute(
+        result = self.execute(
             role=role,
             missing_skills=missing_skills,
             priority_order=priority_order,
@@ -221,6 +221,20 @@ CRITICAL GUIDELINES:
             situation=situation,
             emotional_signals=emotional_signals
         )
+        
+        # CRITICAL VALIDATION: Ensure total_weeks is always present
+        if result and isinstance(result, dict):
+            if 'total_weeks' not in result or result.get('total_weeks') is None:
+                # Calculate from phases or use deadline
+                max_week = 0
+                for phase in result.get('phases', []):
+                    for week in phase.get('weeks', []):
+                        max_week = max(max_week, week.get('week_number', 0))
+                result['total_weeks'] = max(max_week, deadline_weeks or 12)
+            return result
+        
+        # If LLM failed, return fallback
+        return self._get_fallback_roadmap(role, deadline_weeks, weekly_hours)
 
 
 def _get_role_specific_skills(role: str) -> Dict[str, Any]:

@@ -4,6 +4,9 @@ RebalanceAgent - Regenerates roadmaps when user constraints change or progress d
 
 from typing import Optional, Dict, Any, List
 from .base_agent import BaseAgent
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RebalanceAgent(BaseAgent):
@@ -129,13 +132,34 @@ Output ONLY valid JSON, nothing else."""
         Returns:
             Rebalanced roadmap JSON or None
         """
-        return self.execute(
+        result = self.execute(
             current_roadmap=current_roadmap,
             progress_data=progress_data,
             user_data=user_data,
             rebalance_reason=rebalance_reason,
             new_weekly_hours=new_weekly_hours,
             new_deadline_weeks=new_deadline_weeks
+        )
+        
+        # CRITICAL VALIDATION: Ensure total_weeks is always present
+        if result and isinstance(result, dict):
+            if 'total_weeks' not in result or result.get('total_weeks') is None:
+                logger.warning("Rebalance response missing total_weeks, calculating from phases...")
+                # Calculate from phases
+                max_week = 0
+                for phase in result.get('phases', []):
+                    for week in phase.get('weeks', []):
+                        max_week = max(max_week, week.get('week_number', 0))
+                result['total_weeks'] = max(max_week, current_roadmap.get('total_weeks', 12))
+            return result
+        
+        # If LLM failed, fallback to simple rebalance
+        logger.warning("Rebalance agent failed, using simple_rebalance fallback")
+        return simple_rebalance(
+            current_roadmap=current_roadmap,
+            progress_data=progress_data,
+            new_weekly_hours=new_weekly_hours,
+            original_weekly_hours=user_data.get('weekly_hours', 10)
         )
 
 

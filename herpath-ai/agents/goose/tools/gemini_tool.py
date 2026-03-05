@@ -66,13 +66,9 @@ def _get_api_key() -> Optional[str]:
     except Exception as e:
         logger.debug(f"Failed to load .env: {e}")
     
-    # Fallback to hardcoded key (from production secrets.toml)
-    fallback_key = "AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8"
-    if fallback_key and len(fallback_key) > 20:
-        logger.warning("Using fallback GEMINI_API_KEY - ensure config is properly loaded")
-        return fallback_key
-    
+    # No hardcoded fallback - API key must come from config (secrets.toml or environment)
     logger.error("GEMINI_API_KEY not found in any source!")
+    logger.error("Ensure GEMINI_API_KEY is set in .streamlit/secrets.toml or GEMINI_API_KEY environment variable")
     return None
 
 

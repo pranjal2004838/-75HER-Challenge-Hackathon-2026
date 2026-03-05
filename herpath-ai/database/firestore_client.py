@@ -264,6 +264,16 @@ class FirestoreClient:
         try:
             uid = roadmap_data.get('uid')
             
+            # SAFEGUARD: Ensure total_weeks is always present (required field)
+            if 'total_weeks' not in roadmap_data or roadmap_data.get('total_weeks') is None:
+                # Calculate from phases if not provided
+                phases = roadmap_data.get('phases', [])
+                max_week = 0
+                for phase in phases:
+                    for week in phase.get('weeks', []):
+                        max_week = max(max_week, week.get('week_number', 0))
+                roadmap_data['total_weeks'] = max(max_week, 12)  # Min 12 weeks if empty
+            
             # Deactivate previous active roadmaps
             self._deactivate_user_roadmaps(uid)
             

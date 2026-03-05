@@ -9,15 +9,22 @@
 
 ### **Issue: Gemini API Not Responding**
 
-**Root Cause:** Two conflicting API keys in configuration files:
-- `.streamlit/secrets.toml`: `AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8` (production key)
-- `.env`: `AIzaSyCpBYWppUsNjEmMM7e2vsBo4MFUUASXABY` (old/invalid key)
+**Root Cause:** 
+- Gemini API key was exposed/leaked in GitHub (detected by Google's security scanner)
+- Google automatically blacklisted the key, returning 403 PERMISSION_DENIED on all requests
+- No configuration or fallback logic can fix a blacklisted API key
+
+**Root Cause (Previous):** 
+- Two conflicting API keys in configuration files (`.streamlit/secrets.toml` vs `.env`)
+- Mismatch between development and production configurations
+- Code lacked robust multi-source credential loading
 
 **Why This Broke:**
-1. Local testing couldn't find API key in environment variables
-2. Streamlit secrets not loaded outside Streamlit context
-3. Mismatch between development and production configs
-4. Code didn't have robust fallback strategy
+1. If API key is exposed in git history or public repos, Google detects and blacklists it
+2. Fallback/retry logic cannot overcome a permanently blacklisted key
+3. A NEW API key must be generated from Google if the old one is compromised
+4. Local testing couldn't find API key in environment variables
+5. Mismatch between development and production configs
 
 ---
 
@@ -32,26 +39,24 @@
 **New priority order:**
 ```
 1. Streamlit secrets (st.secrets.get("GEMINI_API_KEY"))
-   → Used in production on Streamlit Cloud
+   → Use for production on Streamlit Cloud
+   → Key must be set in Streamlit Cloud Settings → Secrets
    
 2. Environment variable (os.getenv("GEMINI_API_KEY"))
-   → Used in Docker/Cloud deployments
+   → Use for Docker/Cloud deployments
    
 3. .env file (load_dotenv)
-   → Used in local development
-   
-4. Hardcoded fallback key
-   → Last resort for emergency/demo mode
-   → Key: AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8
+   → Use for local development
+   → .env is in .gitignore (NOT committed to repository)
 ```
 
-### **2. Fixed Configuration Consistency**
+**IMPORTANT: API Key Security**
+- ❌ DO NOT hardcode API keys in source code
+- ❌ DO NOT store API keys in public files
+- ❌ DO NOT expose API keys in git history
+- ✅ Store only in `.streamlit/secrets.toml` (production) and `.env` (local dev)
+- ✅ Both files are in `.gitignore` and are NOT committed
 
-**Updated .env file:**
-```
-GEMINI_API_KEY='AIzaSyAgCHTHi7rOuBm7Jp3o5DFAWgPY1Ah0ar8'
-```
-Now matches `.streamlit/secrets.toml` (production key)
 
 ### **3. Added Pre-Demo Health Check System**
 

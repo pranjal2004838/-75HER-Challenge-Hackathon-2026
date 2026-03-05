@@ -148,7 +148,7 @@ Judges can verify HERPath AI works by:
 
 Full 6-minute video walkthrough from account creation through AI coaching:
 
-📹 [**Watch Demo Video**](scripts/demo_video.mp4) (3.83 MB, MP4 — highly compressed)
+📹 [**Watch Demo Video**](scripts/demo_video.mp4) (10.11 MB, MP4 — full resolution, optimized quality)
 
 **Video includes:**
 - Account creation & 7-step onboarding wizard

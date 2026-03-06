@@ -226,13 +226,6 @@ def _render_week(week: Dict, current_week: int, db_client, uid: str):
             with col2:
                 st.caption(f"✅ **Success Metric:** {success_metric}")
         
-        # Milestone
-        if milestone:
-            st.markdown(f"**🏆 Milestone:** {milestone}")
-        
-        if success_metric:
-            st.caption(f"Success Metric: {success_metric}")
-        
         # Resources
         resources = week.get('resources', [])
         interview_relevance = week.get('interview_relevance', '')

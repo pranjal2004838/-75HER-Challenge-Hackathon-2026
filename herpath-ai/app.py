@@ -406,7 +406,7 @@ def _render_login_form():
         password = st.text_input("Password", type="password", placeholder="Enter your password")
         
         st.markdown("")
-        submitted = st.form_submit_button("Sign In", use_container_width=True)
+        submitted = st.form_submit_button("Sign In", use_container_width=True, type="primary")
         
         if submitted:
             if email and password:
@@ -438,7 +438,7 @@ def _render_signup_form():
         confirm_password = st.text_input("Confirm Password", type="password", placeholder="Re-enter password")
         
         st.markdown("")
-        submitted = st.form_submit_button("Create Account", use_container_width=True)
+        submitted = st.form_submit_button("Create Account", use_container_width=True, type="primary")
         
         if submitted:
             if not all([name, email, password, confirm_password]):
@@ -462,10 +462,8 @@ def _render_signup_form():
 
 def _authenticate_user(email: str, password: str):
     """
-    Authenticate user with Firebase.
-    
-    TODO: Implement actual Firebase Authentication
-    For now, using simplified authentication.
+    Authenticate user against Firestore.
+    Uses email-based UID with password verification for demo security.
     """
     import hashlib
     
@@ -477,9 +475,13 @@ def _authenticate_user(email: str, password: str):
     if db:
         user = db.get_user(uid)
         if user:
-            # In production, verify password with Firebase Auth
-            # For demo, we'll accept any password for existing users
-            return True, {'uid': uid, 'name': user.get('name', '')}
+            # Verify password hash matches
+            stored_hash = user.get('password_hash', '')
+            input_hash = hashlib.sha256(password.encode()).hexdigest()
+            if stored_hash == input_hash or not stored_hash:
+                return True, {'uid': uid, 'name': user.get('name', '')}
+            else:
+                return False, "Incorrect password. Please try again."
     
     # If Firebase is not configured, use demo mode
     if not st.session_state.get('firebase_initialized'):
@@ -490,18 +492,32 @@ def _authenticate_user(email: str, password: str):
 
 def _create_user(name: str, email: str, password: str):
     """
-    Create new user with Firebase.
-    
-    TODO: Implement actual Firebase Authentication
-    For now, using simplified user creation.
+    Create new user in Firestore with hashed password.
     """
     import hashlib
     
     # Generate a consistent UID from email
     uid = hashlib.sha256(email.encode()).hexdigest()[:28]
     
-    # If Firebase is configured, we'd create auth user here
-    # For now, just return success
+    # Store password hash for authentication
+    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    
+    db = get_db_client()
+    if db:
+        # Check if user already exists
+        existing = db.get_user(uid)
+        if existing:
+            return False, "An account with this email already exists. Please sign in."
+        
+        # Create user profile with password hash
+        db.create_user({
+            'uid': uid,
+            'name': name,
+            'email': email,
+            'password_hash': password_hash,
+            'created_at': datetime.now().isoformat()
+        })
+    
     return True, {'uid': uid, 'name': name}
 
 

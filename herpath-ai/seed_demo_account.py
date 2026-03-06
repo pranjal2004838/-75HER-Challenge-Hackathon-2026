@@ -17,7 +17,7 @@ Usage:
 import sys
 import os
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import hashlib
 
 # Add project root to path
@@ -69,10 +69,12 @@ def seed_demo_account():
         print(f"   UID: {demo_uid}\n")
         
         # 1. Create user profile
+        password_hash = hashlib.sha256(DemoAccountConfig.PASSWORD.encode()).hexdigest()
         user_data = {
             'uid': demo_uid,
             'name': DemoAccountConfig.NAME,
             'email': DemoAccountConfig.EMAIL,
+            'password_hash': password_hash,
             'goal': DemoAccountConfig.GOAL,
             'current_level': DemoAccountConfig.CURRENT_LEVEL,
             'weekly_hours': DemoAccountConfig.WEEKLY_HOURS,
@@ -81,8 +83,8 @@ def seed_demo_account():
             'situation': DemoAccountConfig.SITUATION,
             'background_text': DemoAccountConfig.BACKGROUND,
             'onboarding_completed': True,
-            'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow()
+            'created_at': datetime.now(timezone.utc),
+            'updated_at': datetime.now(timezone.utc)
         }
         
         db.collection('users').document(demo_uid).set(user_data)
@@ -96,8 +98,8 @@ def seed_demo_account():
             'current_week': DemoAccountConfig.CURRENT_WEEK,
             'is_active': True,
             'version': 1,
-            'created_at': datetime.utcnow() - timedelta(weeks=DemoAccountConfig.CURRENT_WEEK),
-            'updated_at': datetime.utcnow(),
+            'created_at': datetime.now(timezone.utc) - timedelta(weeks=DemoAccountConfig.CURRENT_WEEK),
+            'updated_at': datetime.now(timezone.utc),
             'phases': [
                 {
                     'phase_name': 'Phase 1: Python & Programming Foundations',
@@ -189,8 +191,8 @@ def seed_demo_account():
             'pace_status': 'on_track',
             'current_week': DemoAccountConfig.CURRENT_WEEK,
             'streak_days': 12,
-            'last_activity': datetime.utcnow() - timedelta(hours=5),
-            'updated_at': datetime.utcnow()
+            'last_activity': datetime.now(timezone.utc) - timedelta(hours=5),
+            'updated_at': datetime.now(timezone.utc)
         }
         
         db.collection('progress').document(demo_uid).set(progress_data)
@@ -201,9 +203,9 @@ def seed_demo_account():
             {
                 'uid': demo_uid,
                 'user_message': "I'm feeling stuck on list comprehensions. Can you help?",
-                'ai_response': "Absolutely, Sarah! List comprehensions are Python's elegant way to transform lists in one line. Think of them as a compact for-loop. Instead of writing:\n\n```python\nsquares = []\nfor x in range(10):\n    squares.append(x**2)\n```\n\nYou can write: `squares = [x**2 for x in range(10)]`\n\nThe pattern is: `[expression for item in iterable if condition]`\n\nStart simple - convert your for-loops to comprehensions one at a time. Don't worry about mastering nested comprehensions yet; even experienced devs sometimes prefer explicit loops for readability. What specific list comprehension is giving you trouble?",
+                'ai_response': "Absolutely, Maya! List comprehensions are Python's elegant way to transform lists in one line. Think of them as a compact for-loop. Instead of writing:\n\n```python\nsquares = []\nfor x in range(10):\n    squares.append(x**2)\n```\n\nYou can write: `squares = [x**2 for x in range(10)]`\n\nThe pattern is: `[expression for item in iterable if condition]`\n\nSince you already have data analyst experience, think of it like a SQL SELECT with a WHERE clause — same filtering logic, just Python syntax. Start simple - convert your for-loops to comprehensions one at a time. What specific list comprehension is giving you trouble?",
                 'mode': 'feeling_stuck',
-                'timestamp': datetime.utcnow() - timedelta(days=2),
+                'timestamp': datetime.now(timezone.utc) - timedelta(days=2),
                 'page': 'coach'
             },
             {
@@ -211,7 +213,7 @@ def seed_demo_account():
                 'user_message': "How do I know if I'm ready to move from Python basics to ML?",
                 'ai_response': "Great question! You're ready when you can confidently do these 3 things:\n\n**1. Data Wrangling (70% of ML work)**\n- Load CSV/JSON files without googling\n- Filter, sort, group data with pandas\n- Handle missing values and duplicates\n\n**2. Functions & Logic**\n- Write functions that take parameters and return values\n- Use if/else and loops naturally\n- Debug errors by reading stack traces\n\n**3. Basic Math Comfort**\n- Understand mean, median, variance\n- Can plot data with matplotlib\n- Not afraid of formulas (even if you need to look them up)\n\nYou're at Week 4 with 7 tasks completed - you've covered Python basics and are starting NumPy. Perfect timing! Week 5-8 will bridge you into ML. The key insight: **ML is just Python + math + data**. You already have the Python part. 🎯\n\nDon't wait to feel 'perfectly ready' - that's imposter syndrome talking. Move forward when you're 70% confident, not 100%.",
                 'mode': 'clarify_plan',
-                'timestamp': datetime.utcnow() - timedelta(days=1),
+                'timestamp': datetime.now(timezone.utc) - timedelta(days=1),
                 'page': 'coach'
             }
         ]

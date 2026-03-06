@@ -66,15 +66,14 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
-test_coach_direct.py
-test_coach_focused.py
-test_final_coach.py
-test_models.py
+test_*.py
+
+# Debug / Diagnostic scripts
+check_api_key.py
+diagnose_gemini.py
+view_firebase_data.py
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
-
-test_streamlit_simulation.py
-test_toml.py

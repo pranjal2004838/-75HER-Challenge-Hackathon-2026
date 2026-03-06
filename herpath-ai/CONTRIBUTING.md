@@ -285,7 +285,7 @@ Goal: >80% coverage for critical paths
    - Added emotional signal detection for imposter syndrome
    
    ## Testing
-   - Tested with demo account (judge@herpath-demo.ai)
+   - Tested with demo account (demo@herpath.ai)
    - All unit tests pass: `pytest -v`
    
    ## Checklist

@@ -76,9 +76,6 @@ def init_firebase():
     else:
         st.warning("⚠️ Firebase not configured after init attempt. Running in demo mode.")
         return False
-    
-    _firebase_initialized = True
-    return True
 
 def get_firebase_app():
     """Get or initialize Firebase app."""

@@ -210,12 +210,12 @@ class FeatureFlags:
     """Feature toggles for gradual rollout."""
     
     ENABLE_GOOSE_FRAMEWORK: bool = True
-    ENABLE_FIREBASE_AUTH: bool = False  # TODO: Implement full auth
+    ENABLE_FIREBASE_AUTH: bool = False  # Simplified auth for hackathon MVP
     ENABLE_ANALYTICS: bool = True
     ENABLE_CHAT_HISTORY: bool = True
-    ENABLE_ROADMAP_EXPORT: bool = False  # TODO: Add PDF export
-    ENABLE_EMAIL_NOTIFICATIONS: bool = False  # TODO: Add email service
-    ENABLE_DARK_MODE: bool = False  # TODO: Add dark theme
+    ENABLE_ROADMAP_EXPORT: bool = False  # Planned: PDF export
+    ENABLE_EMAIL_NOTIFICATIONS: bool = False  # Planned: Email service
+    ENABLE_DARK_MODE: bool = False  # Planned: Dark theme
 
 
 # ============================================================================
@@ -226,9 +226,9 @@ class DemoAccountConfig:
     """Pre-seeded demo account configuration."""
     
     # Demo user credentials
-    EMAIL: str = "judge@herpath-demo.ai"
-    PASSWORD: str = "HERPathDemo2026"  # For demo purposes only
-    NAME: str = "Sarah Chen"
+    EMAIL: str = "demo@herpath.ai"
+    PASSWORD: str = "HERPath2026!"  # For demo purposes only
+    NAME: str = "Maya Johnson"
     
     # Demo user profile
     GOAL: str = "AI Engineer"
@@ -237,7 +237,7 @@ class DemoAccountConfig:
     DEADLINE_WEEKS: int = 26
     FINANCIAL_CONSTRAINT: str = "Mixed (Free preferred, paid okay)"
     SITUATION: str = "Career Transition"
-    BACKGROUND: str = "Former teacher with 5 years experience. Learning Python for 6 months. Strong in math and logic, need help with ML concepts."
+    BACKGROUND: str = "Former data analyst with 3 years experience. Comfortable with Python and SQL, looking to transition into AI/ML engineering. Strong analytical skills, need guidance on deep learning frameworks and system design."
     
     # Demo roadmap progress
     CURRENT_WEEK: int = 4

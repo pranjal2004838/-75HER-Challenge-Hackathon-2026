@@ -144,14 +144,14 @@ Full walkthrough: account creation → 7-step onboarding → AI roadmap generati
 
 | Feature | Screenshot |
 |---------|-----------|
-| Landing Page | ![Landing](herpath-ai/scripts/screenshots/01_landing_page.png) |
-| Onboarding Wizard | ![Onboarding](herpath-ai/scripts/screenshots/05_step1_goal.png) |
-| Profile Summary | ![Profile](herpath-ai/scripts/screenshots/11_step7_profile_summary.png) |
-| AI-Generated Roadmap | ![Roadmap](herpath-ai/scripts/screenshots/Roadmap.png?raw=true) |
-| Dashboard | ![Dashboard](herpath-ai/scripts/screenshots/Dashboard.png?raw=true) |
-| AI Coach | ![Coach](herpath-ai/scripts/screenshots/Ai%20Coach.png?raw=true) |
-| Progress Tracking | ![Progress](herpath-ai/scripts/screenshots/Progress.png?raw=true) |
-| Rebalancing | ![Rebalance](herpath-ai/scripts/screenshots/Rebalancing.png?raw=true) |
+| Landing Page | ![HERPath AI landing page with hero text and call-to-action buttons for signup and login](herpath-ai/scripts/screenshots/01_landing_page.png) |
+| Onboarding Wizard | ![Step 1 of 7-step onboarding wizard asking user to select career goal](herpath-ai/scripts/screenshots/05_step1_goal.png) |
+| Profile Summary | ![Step 7 profile summary showing all collected user information before roadmap generation](herpath-ai/scripts/screenshots/11_step7_profile_summary.png) |
+| AI-Generated Roadmap | ![Personalized 26-week roadmap with 3 phases, week-by-week tasks, specific resources, and hour estimates](herpath-ai/scripts/screenshots/Roadmap.png?raw=true) |
+| Dashboard | ![Dashboard overview showing progress metrics, next tasks, and quick stats for active user](herpath-ai/scripts/screenshots/Dashboard.png?raw=true) |
+| AI Coach | ![AI Coach chat interface with context-aware response to user message about feeling stuck](herpath-ai/scripts/screenshots/Ai%20Coach.png?raw=true) |
+| Progress Tracking | ![Progress analytics dashboard with completion rates, weekly pace charts, and milestone tracking](herpath-ai/scripts/screenshots/Progress.png?raw=true) |
+| Rebalancing | ![Rebalanced roadmap after system detected missed tasks, showing extended timeline and reprioritized tasks](herpath-ai/scripts/screenshots/Rebalancing.png?raw=true) |
 
 ---
 

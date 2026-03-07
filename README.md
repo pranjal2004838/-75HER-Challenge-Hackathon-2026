@@ -147,11 +147,11 @@ Full walkthrough: account creation → 7-step onboarding → AI roadmap generati
 | Landing Page | ![Landing](herpath-ai/scripts/screenshots/01_landing_page.png) |
 | Onboarding Wizard | ![Onboarding](herpath-ai/scripts/screenshots/05_step1_goal.png) |
 | Profile Summary | ![Profile](herpath-ai/scripts/screenshots/11_step7_profile_summary.png) |
-| AI-Generated Roadmap | ![Roadmap](herpath-ai/scripts/screenshots/Roadmap.png) |
-| Dashboard | ![Dashboard](herpath-ai/scripts/screenshots/Dashboard.png) |
-| AI Coach | ![Coach](herpath-ai/scripts/screenshots/Ai Coach.png) |
-| Progress Tracking | ![Progress](herpath-ai/scripts/screenshots/Progress.png) |
-| Rebalancing | ![Rebalance](herpath-ai/scripts/screenshots/Rebalancing.png) |
+| AI-Generated Roadmap | ![Roadmap](herpath-ai/scripts/screenshots/Roadmap.png?raw=true) |
+| Dashboard | ![Dashboard](herpath-ai/scripts/screenshots/Dashboard.png?raw=true) |
+| AI Coach | ![Coach](herpath-ai/scripts/screenshots/Ai%20Coach.png?raw=true) |
+| Progress Tracking | ![Progress](herpath-ai/scripts/screenshots/Progress.png?raw=true) |
+| Rebalancing | ![Rebalance](herpath-ai/scripts/screenshots/Rebalancing.png?raw=true) |
 
 ---
 
